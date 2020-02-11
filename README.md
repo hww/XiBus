@@ -4,7 +4,7 @@ Implementation of NuBus controller with Verilog
 
 ## ToDo List
 
-- [v] Arbiter
+- [X] Arbiter
 - [x] Slave
 - [x] Master
 - [x] Errors

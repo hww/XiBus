@@ -1,0 +1,7 @@
+#!/bin/bash
+verilator -Wall -cc pal_arbiter.v --prefix PalArbiter --exe pal_arbiter_test.cpp -CFLAGS "-std=c++11"
+cd obj_dir
+make -j8 -f PalArbiter.mk PalArbiter
+./PalArbiter
+cd ..
+

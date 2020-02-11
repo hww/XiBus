@@ -1,0 +1,3 @@
+#!/bin/bash
+verilator -Wall -cc ic74als161.v --prefix IC74ALS161
+

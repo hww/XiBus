@@ -1,0 +1,3 @@
+#!/bin/bash
+verilator -Wall -cc pal_misc.v --prefix PalMisc
+

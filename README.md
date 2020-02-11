@@ -4,10 +4,10 @@ Implementation of NuBus controller with Verilog
 
 ## ToDo List
 
-- Arbiter [ ]
-- Slave [ ]
-- Master [ ]
-- Errors [ ]
-- Interrupts [ ]
-- Parity [ ]
-- Block Transfer [ ]
+- [v] Arbiter
+- [x] Slave
+- [x] Master
+- [x] Errors
+- [x] Interrupts 
+- [x] Parity
+- [x] Block Transfer

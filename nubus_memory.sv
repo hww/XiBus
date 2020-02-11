@@ -80,6 +80,6 @@ module nubus_memory
       end 
    end // always @ (posedge mem_clkn or negedge mem_resetn)
 
-   assign mem_ready = ready[WAIT_CLOCKS];
+   assign mem_ready_o = ready[WAIT_CLOCKS];
 
 endmodule

@@ -297,6 +297,8 @@ module nubus_vm2s_tb ();
    // Memory interface
    // ======================================================
 
+   wire mem_write; // unused, just for debugging 
+   
    nubus_memory NMem
      (
       .mem_clk(~nub_clkn),
@@ -305,8 +307,11 @@ module nubus_vm2s_tb ();
       .mem_wstrb(mem_wstrb),
       .mem_addr(mem_addr),
       .mem_wdata(mem_wdata),
+      .mem_rdata_o(mem_rdata),
       .mem_myslot(mem_myslot),
-      .mem_myexp(mem_myexp)
+      .mem_myexp(mem_myexp),
+      .mem_ready_o(mem_ready),
+      .mem_write_o(mem_write)
       );
 
 endmodule

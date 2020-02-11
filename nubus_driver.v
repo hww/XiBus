@@ -31,8 +31,8 @@ module nubus_driver
    input  mst_tm1n, // Address ines
    input  mst_tm0n, // Address ines
 
-   output nub_tm0_o, // Transfer mode
-   output nub_tm1_o, // Transfer mode
+   output nub_tm0n_o, // Transfer mode
+   output nub_tm1n_o, // Transfer mode
    output nub_tmoe_o, // Transfer mode enable
    output nub_ack_o, // Achnowlege
    output nub_start_o, // Transfer start
@@ -47,12 +47,12 @@ module nubus_driver
    // Rename inputs
    // ----------------------------------------------------
 
+   wire   locked = mst_locked;
    wire   ackcy = mst_ackcy;
    wire   arbcy = mst_arbcy;
    wire   adrcy = mst_adrcy;
    wire   dtacy = mst_dtacy;
    wire   owner = mst_owner;
-   wire   locked = mst_locked;
    wire   tm1n = mst_tm1n;
    wire   tm0n = mst_tm0n;
    
@@ -75,44 +75,44 @@ module nubus_driver
       
    // Bus request enable
    assign rqstoe        = arbcy & ~adrcy  			
-			  /* hold untill START* for normal case */
-                          | arbcy & locked
-			  /* hold untill NULL-ATTN for locked case */
-			  ;
+			/* hold untill START* for normal case */
+                        | arbcy & locked
+			/* hold untill NULL-ATTN for locked case */
+			;
 
    // Transfer mode enable				
    assign tmoe          = ackcy
-                          /* SLAVE response */
-		          | owner & arbcy & ~dtacy 	
-                          /* we own bus, while not waiting for ACK */
-                          ;
+                        /* SLAVE response */
+		        | owner & arbcy & ~dtacy 	
+                        /* we own bus, while not waiting for ACK */
+                        ;
    // Transfer acknowlege				
    assign ack		= ackcy 
-			  /* slave response */
-	         	  | owner & ~adrcy
-			  /* for NULL-ATTN, LOCK-ATTN */
-	         	  ;
+			/* slave response */
+	         	| owner & ~adrcy
+			/* for NULL-ATTN, LOCK-ATTN */
+	         	;
    // Transmission mode 
    assign tm1		= ackcy				
-			  /* SLAVE response */
-		     	  | owner & adrcy & ~tm1n 	
-		     	  /* START* at address cycle */
-		     	  | owner & ~adrcy & ~locked
-                          /* set for NULL-ATTN */
-                          ;
+			/* SLAVE response */
+		     	| owner & adrcy & ~tm1n 	
+		     	/* START* at address cycle */
+		     	| owner & ~adrcy & ~locked
+                        /* set for NULL-ATTN */
+                        ;
    // Transmission mode 
    assign tm0		= ackcy			
-			  /* SLAVE response */
-		     	  | owner & adrcy & ~tm0n	
-		     	  /* START* at address cycle */
-		     	  | owner & ~adrcy			
-			  /* always set for xxx-ATTN */
-			  ;
+			/* SLAVE response */
+		     	| owner & adrcy & ~tm0n	
+		     	/* START* at address cycle */
+		     	| owner & ~adrcy			
+			/* always set for xxx-ATTN */
+			;
    
    assign mstdn 	= owner & ~locked & dtacy * ack
-			  /* done all tail end of normal cycle */
-               	          | owner & ~locked & arbcy & ~adrcy & dtacy 
-               	          /* done dor locked cases */
-               	          ;
+			/* done all tail end of normal cycle */
+               	        | owner & ~locked & arbcy & ~adrcy & dtacy 
+               	        /* done dor locked cases */
+               	        ;
 
 endmodule

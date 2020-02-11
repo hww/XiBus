@@ -43,8 +43,8 @@ module nubus_master
    output dtacy_o, // Data strobe
    output adrcy_o, // Address strobe
    output arbcy_o,	// Arbiter enabled
-   output tm1_o,
-   output tm0_o
+   output tm1n_o,
+   output tm0n_o
    );
 
    reg    locked, arbdn, busy, owner, dtacy, adrcy, arbcy;
@@ -63,6 +63,9 @@ module nubus_master
    wire   start = ~nub_startn;
    wire   rqst = ~nub_rqstn;
 
+   assign tm1n_o = 0;
+   assign tm0n_o = 0;
+ 
    always @(posedge clkn or posedge reset) begin : proc_slv_master
       if(reset) begin
 	       arbcy 	<= 0;

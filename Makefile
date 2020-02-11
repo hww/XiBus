@@ -6,10 +6,10 @@ ICARUS_FLAGS = -g2012
 # Test access virtual Master to slave
 # ==========================================
 
-nubus_w2s: nubus_vm2s_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_misc.v nubus_driver.v nubus_memory.sv
+nubus_vm2s: nubus_vm2s_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv
 	iverilog $(ICARUS_FLAGS) -o nubus_vm2s_tb.vvp $^ 
 
-test_w2s.vvp: nubus_vm2s_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_misc.v nubus_driver.v nubus_memory.sv
+test_vm2s.vvp: nubus_vm2s_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv
 	iverilog $(ICARUS_FLAGS) -o nubus_vm2s_tb.vvp $^
 	vvp nubus_vm2s_tb.vvp
 

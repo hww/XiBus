@@ -61,7 +61,7 @@ module nubus
     output        mem_myexp
   );
 
-`include "nubusdefs.sv"
+`include "nubus.sv"
 
 
    // ==========================================================================
@@ -77,24 +77,49 @@ module nubus
    // ==========================================================================
 
    reg [31:0]     address;
-   wire           cab, wab, sab;
-
-   always @(posedge cab or posedge nub_reset) begin : proc_read_nub_ad
+   wire           nub_adwr = slv_slave & ~nub_startn;
+   
+   always @(posedge ~nub_clk or posedge nub_reset) begin : proc_read_nub_ad
       if (nub_reset) begin
          address <= 0;
-      end else if (wab) begin
+      end else if (nub_adwr) begin
          address <= nub_ad;
       end
    end
+   
+   wire [31:0] slv_busb = mem_rdata;
+   wire [31:0] mst_busb = mst_adrcy  ? cpu_addr : cpu_wdata;
+   wire [31:0] busb     = slv_master ? mst_busb : slv_busb;
+   wire        busbwr = mst_dtacy | mst_adrcy;
+   
+   reg [31:0] nub_adoreg;
+
+   always @(posedge nub_clkn or posedge nub_reset) begin : proc_out_nub_ad
+      if (nub_reset) begin
+         nub_adoreg <= 0;
+      end else begin
+         if (busbwr)
+           nub_adoreg <= busb;
+      end
+   end
+   
+   // When 1 - drive the NuBus AD lines 
+   assign gba =   slv_slave  & slv_tm1n
+                /*SLAVE read of card*/
+                | slv_master & mst_adrcy
+                /*MASTER address cycle*/
+	        | slv_master & mst_dtacy & mst_tm1n
+                /*MASTER data cycle, when writing*/
+                ;
+   // Output to nubus the 
+   assign nub_adn = gba ? ~nub_adoreg : 'bZ;
 
    // ==========================================================================
    // Slot selection and expansion selection
    // ==========================================================================
 
    // Card ID
-   wire [ 3:0]    nub_id;
-
-   assign nub_id = ~nub_idn;
+   wire [3:0] nub_id = ~nub_idn;
    assign mem_myslot = nub_id == address[27:24] & address[31:28] == SLOTS_ADDRESS;
    assign mem_myexp = (address[31:28] & EXPANSION_MASK) == EXPANSION_ADDR;
 
@@ -102,7 +127,7 @@ module nubus
    // Arbiter Interface
    // ==========================================================================
 
-   wire           arbcy, grant;
+   wire           mst_arbcy, arb_grant;
 
    nubus_arbiter UArbiter
      (
@@ -116,6 +141,9 @@ module nubus
    // Slave FSM
    // ==========================================================================
 
+   wire           slv_master, slv_slave;
+   wire           slv_tm1n, slv_tm0n;
+   
    nubus_slave USlave
      (
       .nub_clkn(nub_clkn), // Clock
@@ -148,9 +176,10 @@ module nubus
       .nub_startn(nub_startn), // Start transfer
       .nub_ackn(nub_ackn), // End of transfer
       .slv_master(slv_master), // Master mode
+      .arb_grant(arb_grant), // Grant access
       .cpu_lock(cpu_lock), // Address line
       .cpu_valid(cpu_valid), // Master mode (delayed)
-      .arb_grant(arb_grant), // Grant access
+
 
       .locked_o(mst_locked), // Locked or not tranfer
       .arbdn_o(mst_arbdn),
@@ -158,7 +187,9 @@ module nubus
       .owner_o(mst_owner), // Address or data transfer
       .dtacy_o(mst_dtacy), // Data strobe
       .adrcy_o(mst_adrcy), // Address strobe
-      .arbcy_o(mst_arbcy)	// Arbiter enabled
+      .arbcy_o(mst_arbcy), // Arbiter enabled
+      .tm1n_o(mst_tm1n),
+      .tm0n_o(mst_tm0n)
    );
 
    // ==========================================================================
@@ -176,8 +207,8 @@ module nubus
       .mst_tm1n(mst_tm1n), // Address ines
       .mst_tm0n(mst_tm0n), // Address ines
 
-      .nub_tm0_o(nub_tm0n), // Transfer mode
-      .nub_tm1_o(nub_tm1n), // Transfer mode
+      .nub_tm0n_o(nub_tm0n), // Transfer mode
+      .nub_tm1n_o(nub_tm1n), // Transfer mode
       .nub_tmoe_o(nub_tmoen), // Transfer mode enable
       .nub_ack_o(nub_ackn), // Achnowlege
       .nub_start_o(startn), // Transfer start
@@ -185,50 +216,6 @@ module nubus
       .nub_rqstoe_o(nub_qstoe), // Bus request enable
       .drv_mstdn_o(drv_mstdn) // Guess: Slave sends /ACK. Master responds with /MSTDN, which allows slave to clear /ACK and listen for next transaction.
       );
-
-   // ==========================================================================
-   // MISC Interface
-   // ==========================================================================
-
-   tri1 mtmn1;
-
-   nubus_misc UMisc
-     (
-      .clk(clk), // Clock
-      .slave(slv_slave), // Slave transaction
-      .master(slv_master), // Master transaction
-      .mtm1n(mst_tm1n),
-      .tm1ln(slv_tm1n), // Transfer mode
-      .adrcy(adrcy), // Address tranfer strobe
-      .dtacy(dtacy), // Data tranfer strobe
-      .myslot(myslot), // Address lines
-
-      .cab(cab), // Clock  AB (To NuBus)
-      .wab(wab), // Write to AB (To NuBus)
-      .sab(sab), // Select AB (To NuBus)
-      .gab(gab), // Output enable AB (To NuBus)
-
-      .cba(cba), // Clock BA (To Card)
-      .wba(wba), // Write BA (To Card)
-      .sba(sba), // Select BA (To Card)
-      .gba(gba), // Output enable BA (To Card)
-
-      .aclk(aclk), // Address Register Clock
-      .aoe(aoe), // Address Register Output Enable
-      .awr(awr)  // Address register Write
-      );
-
-   reg [31:0] b2a;
-
-   always @(posedge cba or posedge nub_reset) begin : proc_out_nub_ad
-      if (nub_reset) begin
-         b2a <= 0;
-      end else begin
-         b2a <= mem_rdata;
-      end
-   end
-
-   assign adn = gba ? ~b2a : 'bZ;
 
    // ==========================================================================
    // Memory Interface
@@ -239,37 +226,37 @@ module nubus
    assign { a1ln, a0ln } = ~address[1:0];
 
    assign mem_addr = address;
-   assign mem_wdata = ~adn;
+   assign mem_wdata = ~nub_adn;
 
    assign mem_valid = slv_slave; // FIX ME should be somthing different
-   assign write = mem_valid & ~slv_tmn1;
+   assign write = mem_valid & ~slv_tm1n;
 
-   assign mem_wstrb[3]   =     write & ~a1ln & ~a0ln & ~slv_tmn0
+   assign mem_wstrb[3]   =     write & ~a1ln & ~a0ln & ~slv_tm0n
                              /* Byte 3 */
-                             | write & ~a1ln & ~a0ln &  slv_tmn0
+                             | write & ~a1ln & ~a0ln &  slv_tm0n
                              /* Half 1 */
-                             | write &  a1ln &  a0ln &  slv_tmn0
+                             | write &  a1ln &  a0ln &  slv_tm0n
                              /* Word */
                              ;
-   assign mem_wstrb[2]   =     write & ~a1ln &  a0ln & ~slv_tmn0
+   assign mem_wstrb[2]   =     write & ~a1ln &  a0ln & ~slv_tm0n
                              /* Byte 2 */
-                             | write & ~a1ln & ~a0ln &  slv_tmn0
+                             | write & ~a1ln & ~a0ln &  slv_tm0n
                              /* Half 1 */
-                             | write &  a1ln &  a0ln &  slv_tmn0
+                             | write &  a1ln &  a0ln &  slv_tm0n
                              /* Word */
                              ;
-   assign mem_wstrb[1]   =     write &  a1ln & ~a0ln & ~slv_tmn0
+   assign mem_wstrb[1]   =     write &  a1ln & ~a0ln & ~slv_tm0n
                              /* Byte 1 */
-                             | write &  a1ln & ~a0ln &  slv_tmn0
+                             | write &  a1ln & ~a0ln &  slv_tm0n
                              /* Half 0 */
-                             | write &  a1ln &  a0ln &  slv_tmn0
+                             | write &  a1ln &  a0ln &  slv_tm0n
                              /* Word */
                              ;
-   assign mem_wstrb[0]   =     write &  a1ln &  a0ln & ~slv_tmn0
+   assign mem_wstrb[0]   =     write &  a1ln &  a0ln & ~slv_tm0n
                              /* Byte 0 */
-                             | write &  a1ln & ~a0ln &  slv_tmn0
+                             | write &  a1ln & ~a0ln &  slv_tm0n
                              /* Half 0 */
-                             | write &  a1ln &  a0ln &  slv_tmn0
+                             | write &  a1ln &  a0ln &  slv_tm0n
                              /* Word */
                              ;
 

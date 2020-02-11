@@ -21,19 +21,19 @@ module nubus_slave
      
    output slave_o, // Slave mode
    output master_o, // MAster mode
-   output myslotln_o,
-   output tmn1_o,
-   output tmn0_o,
+   output myslot_o,
+   output tm1n_o,
+   output tm0n_o,
    output ackcy_o // Acknowlege
    );
 
-   reg        slaven, mastern, myslotln, tmn1, tmn0, ackcy;
+   reg        slaven, mastern, myslotl, tm1nl, tm0nl, ackcy;
    
    assign slave_o = ~slaven;
    assign master_o = ~mastern;
-   assign myslotln_o = myslotln;
-   assign tmn1_o = tmn1;
-   assign tmn0_o = tmn0;
+   assign myslot_o = myslotl;
+   assign tm1n_o = tm1nl;
+   assign tm0n_o = tm0nl;
    assign ackcy_o = ackcy;
 
    wire       clk = nub_clkn;
@@ -48,10 +48,10 @@ module nubus_slave
       if (reset) begin
 	 slaven <= 1;
 	 mastern <= 1;
-	 tmn1 <= 1;
-         tmn0 <= 1;
+	 tm1nl <= 1;
+         tm0nl <= 1;
 	 ackcy <= 0;
-         myslotln <= 1;
+         myslotl <= 0;
       end else begin
 	 slaven    <= reset
 		       /*initialization*/
@@ -73,30 +73,29 @@ module nubus_slave
 
 	 ackcy      <= mem_ready;
 
-         // tmn1 is 1 - reading 
-	 tmn1     <= reset
+         // tm1n is 1 - reading 
+	 tm1nl    <= reset
 		      | tm1n & start & ~ack & myslot
 		      /*setting term, during address cycle*/
-		      | tmn1 & ~start
-		      | tmn1 & ack /*this slave ack*/
-		      | tmn1 & ~myslot
+		      | tm1nl & ~start
+		      | tm1nl & ack /*this slave ack*/
+		      | tm1nl & ~myslot
 		      /*holding terms*/
 		      ;
          
-         tmn0     <= reset
+         tm0nl     <= reset
 		      | tm0n & start & ~ack & myslot
 		      /*setting term, during address cycle*/
-		      | tmn0 & ~start
-		      | tmn0 & ack /*this slave ack*/
-		      | tmn0 & ~myslot
+		      | tm0nl & ~start
+		      | tm0nl & ack /*this slave ack*/
+		      | tm0nl & ~myslot
 		      /*holding terms*/
 		      ;
 
-         myslotln  <= reset
-                      | myslot & start & ~ack
+         myslotl   <= reset
+                      | myslot & start & ~ack & ~reset
                       /*setting */
-                      | myslotln & ~start
-                      | myslotln & ack;
+                      | myslotl & ~ack & ~reset;
          
       end
    end

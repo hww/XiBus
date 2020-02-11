@@ -104,78 +104,81 @@ module nubus_vm2s_tb ();
 
    reg         fsm_clkn;
    reg         fsm_resetn;
-   reg [1:0]   fsm_tmn;
-   reg [1:0]   fsm_statusn;
+   reg         fsm_start;
+   reg [1:0]   fsm_tm;
+   reg [1:0]   fsm_status;
    reg [31:0]  fsm_addr;
    reg [31:0]  fsm_datawr;
    reg [31:0]  fsm_datard;
-   reg         fsm_startn;
-   reg [1:0]   tm; // transfer mode
    reg         fsm_acknd; // half clk delayed ackn
-   wire [31:0] fsm_ad; // address/data
+   wire [1:0]  fsm_tmn = ~fsm_tm;
+
 
    assign nub_clkn     = fsm_clkn;
    assign nub_resetn   = fsm_resetn;
-
-   assign fsm_ad       = fsm_startn ? fsm_addr : fsm_datawr;
-   assign nub_adn      = fsm_tmn[1] ? 'bZ : ~fsm_ad;
-
-   assign nub_tm0n     = fsm_startn ? 'bZ : fsm_tmn[0];
-   assign nub_tm1n     = fsm_startn ? 'bZ : fsm_tmn[1];
-
+   assign nub_startn   = ~fsm_start;
+   
+   assign nub_tm0n     = fsm_start ? fsm_tmn[0] : 'bZ;
+   assign nub_tm1n     = fsm_start ? fsm_tmn[1] : 'bZ;
+   
+   wire [31:0] fsm_ad = fsm_start ? fsm_addr : fsm_datawr;
+   wire nuboe = fsm_start | fsm_tm[1];
+   assign nub_adn     = nuboe ? ~fsm_ad : 'bZ;
+   
    initial begin
       $display ("Start VirtualMaster write to NubusSlave");
       $dumpfile("nubus_vm2s_tb.vcd");
       $dumpvars;
 
-      fsm_clkn <= 0;
+      fsm_clkn <= 1;
       fsm_resetn <= 0;
       fsm_addr <= 0;
       fsm_datawr <= 0;
       fsm_datard  <= 0;
-      fsm_startn <= 1;
-      fsm_statusn <= TM_TRY_AGAIN_LATER;
-      fsm_tmn <= 'h3;
+      fsm_start <= 0;
+      fsm_status <= TM_NOP;
+      fsm_tm <= TM_NOP;
 
-      #100;
+      @ (posedge nub_clkn);
+      @ (posedge nub_clkn);
         fsm_resetn <= 1;
-      #100;
+      @ (posedge nub_clkn);
       $display  ("WR WORD ---------------------------");
-      write_word(TMADN_WR_WORD,   TEST_ADDR+0, TEST_DATA);
+      write_word(TMAD_WR_WORD,   TEST_ADDR+0, TEST_DATA);
       $display  ("RD WORD ---------------------------");
-      read_word (TMADN_RD_WORD,   TEST_ADDR+0);
-      check_word(TMADN_RD_WORD,   TEST_DATA);
+      read_word (TMAD_RD_WORD,   TEST_ADDR+0);
+      check_word(TMAD_RD_WORD,   TEST_DATA);
       $display  ("WR HALF 0 -------------------------");
-      write_word(TMADN_WR_HALF_0, TEST_ADDR+4, TEST_DATA);
+      write_word(TMAD_WR_HALF_0, TEST_ADDR+4, TEST_DATA);
       $display  ("RD HALF 0 -------------------------");
-      read_word (TMADN_RD_HALF_0, TEST_ADDR+4);
-      check_word(TMADN_RD_HALF_0, TEST_DATA);
+      read_word (TMAD_RD_HALF_0, TEST_ADDR+4);
+      check_word(TMAD_RD_HALF_0, TEST_DATA);
       $display  ("WR HALF 1 -------------------------");
-      write_word(TMADN_WR_HALF_1, TEST_ADDR+8, TEST_DATA);
+      write_word(TMAD_WR_HALF_1, TEST_ADDR+8, TEST_DATA);
       $display  ("RD HALF 1 -------------------------");
-      read_word (TMADN_RD_HALF_1, TEST_ADDR+8);
-      check_word(TMADN_RD_HALF_1, TEST_DATA);
+      read_word (TMAD_RD_HALF_1, TEST_ADDR+8);
+      check_word(TMAD_RD_HALF_1, TEST_DATA);
 
       $display  ("WR BYTE 0 -------------------------");
-      write_word(TMADN_WR_BYTE_0,  TEST_ADDR+12, TEST_DATA);
+      write_word(TMAD_WR_BYTE_0,  TEST_ADDR+12, TEST_DATA);
       $display  ("RD BYTE 0 -------------------------");
-      read_word (TMADN_RD_BYTE_0,  TEST_ADDR+12);
-      check_word(TMADN_RD_BYTE_0,  TEST_DATA);
+      read_word (TMAD_RD_BYTE_0,  TEST_ADDR+12);
+      check_word(TMAD_RD_BYTE_0,  TEST_DATA);
       $display  ("WR BYTE 1 -------------------------");
-      write_word(TMADN_WR_BYTE_1,  TEST_ADDR+16, TEST_DATA);
+      write_word(TMAD_WR_BYTE_1,  TEST_ADDR+16, TEST_DATA);
       $display  ("RD BYTE 1 -------------------------");
-      read_word (TMADN_RD_BYTE_1,  TEST_ADDR+16);
-      check_word(TMADN_RD_BYTE_1,  TEST_DATA);
+      read_word (TMAD_RD_BYTE_1,  TEST_ADDR+16);
+      check_word(TMAD_RD_BYTE_1,  TEST_DATA);
       $display  ("WR BYTE 2 -------------------------");
-      write_word(TMADN_WR_BYTE_2,  TEST_ADDR+20, TEST_DATA);
+      write_word(TMAD_WR_BYTE_2,  TEST_ADDR+20, TEST_DATA);
       $display  ("RD BYTE 2 -------------------------");
-      read_word (TMADN_RD_BYTE_2,  TEST_ADDR+20);
-      check_word(TMADN_RD_BYTE_2,  TEST_DATA);
+      read_word (TMAD_RD_BYTE_2,  TEST_ADDR+20);
+      check_word(TMAD_RD_BYTE_2,  TEST_DATA);
       $display  ("WR BYTE 3 -------------------------");
-      write_word(TMADN_WR_BYTE_3,  TEST_ADDR+24, TEST_DATA);
+      write_word(TMAD_WR_BYTE_3,  TEST_ADDR+24, TEST_DATA);
       $display  ("RD BYTE 3 -------------------------");
-      read_word (TMADN_RD_BYTE_3,  TEST_ADDR+24);
-      check_word(TMADN_RD_BYTE_3,  TEST_DATA);
+      read_word (TMAD_RD_BYTE_3,  TEST_ADDR+24);
+      check_word(TMAD_RD_BYTE_3,  TEST_DATA);
       $display  ("END -------------------------------");
       #1000;
 
@@ -188,28 +191,27 @@ module nubus_vm2s_tb ();
    // ======================================================
 
    task write_word;
-      input [3:0]  tmadn;
+      input [3:0]  tmad;
       input [31:0] addr;
       input [31:0] data;
       begin
-         $display ("%g write address: $%h tm: $%h data: $%h", $time, addr, tmadn, data);
-         @ (posedge nub_clkn);
+         $display ("%g write address: $%h tm: $%h data: $%h", $time, addr, tmad, data);
          fsm_datawr <= data;
          fsm_addr[31:2] <= addr[31:2];
-         fsm_addr[ 1:0] <= ~tmadn[1:0]; 
-         fsm_tmn <= tmadn[3:2];
-         fsm_startn <= 0;
-         fsm_statusn <= TM_TRY_AGAIN_LATER;
+         fsm_addr[ 1:0] <= tmad[1:0]; 
+         fsm_tm <= tmad[3:2];
+         fsm_start <= 1;
+         fsm_status <= TM_NOP;
          @ (posedge nub_clkn);
-         fsm_startn <= 1;
+         fsm_start <= 0;
          fsm_acknd <= nub_ackn;
          do begin
             @ (negedge nub_clkn);
             fsm_acknd <= nub_ackn;
-            fsm_statusn <= { nub_tm1n, nub_tm0n };
+            fsm_status <= ~{ nub_tm1n, nub_tm0n };
             @ (posedge nub_clkn);
          end while (fsm_acknd) ;
-         $display("%g write end            status: $%h ", $time, fsm_statusn);
+         $display("%g write end            status: $%h ", $time, fsm_status);
       end
    endtask
 
@@ -218,28 +220,27 @@ module nubus_vm2s_tb ();
    // ======================================================
 
    task read_word;
-      input [3:0]  tmadn;
+      input [3:0]  tmad;
       input [31:0] addr;
       begin
-         $display ("%g  read address: $%h tm: $%h", $time, addr, tmadn);
-         @ (posedge nub_clkn);
+         $display ("%g  read address: $%h tm: $%h", $time, addr, tmad);
          fsm_addr[31:2] <= addr[31:2];
-         fsm_addr[ 1:0] <= ~tmadn[1:0];
-         fsm_tmn <= tmadn[3:2];
-         fsm_startn <= 0;
-         fsm_statusn <= TM_TRY_AGAIN_LATER;
+         fsm_addr[ 1:0] <= tmad[1:0];
+         fsm_tm <= tmad[3:2];
+         fsm_start <= 1;
+         fsm_status <= TM_NOP;
          @ (posedge nub_clkn);
-         fsm_startn <= 1;
+         fsm_start <= 0;
          fsm_acknd <= nub_ackn;
          do begin
             @ (negedge nub_clkn);
             fsm_datard <= ~nub_adn;
             fsm_acknd <= nub_ackn;
-            fsm_statusn <= { nub_tm1n, nub_tm0n };
+            fsm_status <= ~{ nub_tm1n, nub_tm0n };
             @ (posedge nub_clkn);
          end while (fsm_acknd) ;
 
-         $display("%g read end             status: $%h     data: $%h", $time, fsm_statusn, fsm_datard);
+         $display("%g read end             status: $%h     data: $%h", $time, fsm_status, fsm_datard);
       end
    endtask
 
@@ -250,12 +251,12 @@ module nubus_vm2s_tb ();
 
    task check_word
      (
-      input [3:0]  tmn,
+      input [3:0]  tm,
       input [31:0] data_wr
       );
       reg          expected;
       begin
-         expected = (data_wr & get_mask(tmn));
+         expected = (data_wr & get_mask(tm));
          if (fsm_datard == expected)
            $display ("PASSED");
          else
@@ -267,17 +268,17 @@ module nubus_vm2s_tb ();
    // Convert tmx lines to the data mask
    // ======================================================
 
-   function [31:0] get_mask (input [3:0] tmn);
+   function [31:0] get_mask (input [3:0] tm);
       begin
-         case (tmn)
-           TMADN_RD_BYTE_3: get_mask = 'hFF000000;
-           TMADN_RD_BYTE_2: get_mask = 'h00FF0000;
-           TMADN_RD_BYTE_1: get_mask = 'h0000FF00;
-           TMADN_RD_BYTE_0: get_mask = 'h000000FF;
-           TMADN_RD_HALF_1: get_mask = 'hFFFF0000;
-           TMADN_RD_BLOCK:  get_mask = 'hFFFFFFFF;
-           TMADN_RD_HALF_0: get_mask = 'h0000FFFF;
-           TMADN_RD_WORD:   get_mask = 'hFFFFFFFF;
+         case (tm)
+           TMAD_RD_WORD:   get_mask = 'hFFFFFFFF;
+           TMAD_RD_HALF_0: get_mask = 'h0000FFFF;
+           TMAD_RD_BLOCK:  get_mask = 'hFFFFFFFF;
+           TMAD_RD_HALF_1: get_mask = 'hFFFF0000;
+           TMAD_RD_BYTE_0: get_mask = 'h000000FF;
+           TMAD_RD_BYTE_1: get_mask = 'h0000FF00;
+           TMAD_RD_BYTE_2: get_mask = 'h00FF0000;
+           TMAD_RD_BYTE_3: get_mask = 'hFF000000;
          endcase // case (tmn)
       end
    endfunction // do_math
@@ -287,10 +288,10 @@ module nubus_vm2s_tb ();
    // ======================================================
 
    always begin
-      fsm_clkn <= 0;
-      #25;
       fsm_clkn <= 1;
       #75;
+      fsm_clkn <= 0;
+      #25;
    end
 
    // ======================================================

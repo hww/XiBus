@@ -22,7 +22,7 @@
 
 module nubus_driver
   (
-   input  mst_ackcy, // Achnowlege
+   input  slv_ackcy, // Achnowlege
    input  mst_arbcy, // Arbiter enabled
    input  mst_adrcy, // Address strobe
    input  mst_dtacy, // Data strobe
@@ -33,22 +33,22 @@ module nubus_driver
 
    output nub_tm0n_o, // Transfer mode
    output nub_tm1n_o, // Transfer mode
-   output nub_tmoe_o, // Transfer mode enable
-   output nub_ack_o, // Achnowlege
+   output nub_ackn_o, // Achnowlege
    output nub_start_o, // Transfer start
    output nub_rqst_o, // Bus request
    output nub_rqstoe_o, // Bus request enable
+   output drv_tmoe_o, // Transfer mode enable
    output drv_mstdn_o // Guess: Slave sends /ACK. Master responds with /MSTDN, which allows slave to clear /ACK and listen for next transaction.
    );
    
-   wire   tm0, tm1, tmoe, ack, start, rqst, rqstoe, mstdn;
+   wire   tm0, tm1, tmoe, ack, rqstoe, mstdn;
 
    // ----------------------------------------------------
    // Rename inputs
    // ----------------------------------------------------
 
    wire   locked = mst_locked;
-   wire   ackcy = mst_ackcy;
+   wire   ackcy = slv_ackcy;
    wire   arbcy = mst_arbcy;
    wire   adrcy = mst_adrcy;
    wire   dtacy = mst_dtacy;
@@ -59,10 +59,11 @@ module nubus_driver
    // ----------------------------------------------------
    // Drive outputs
    // ----------------------------------------------------
-   
-   assign nub_tm0n_o   = tmoe  ? tm0 : 'bZ;
-   assign nub_tm1n_o   = tmoe  ? tm1 : 'bZ;
-   assign nub_ackn_o   = tmoe  ? ack : 'bZ;
+
+   assign drv_tmoe_o   = tmoe;
+   assign nub_tm0n_o   = tmoe  ? ~tm0 : 'bZ;
+   assign nub_tm1n_o   = tmoe  ? ~tm1 : 'bZ;
+   assign nub_ackn_o   = tmoe  ? ~ack : 'bZ;
    assign nub_startn_o = owner ? dtacy : 'bZ;
    assign nub_rqstn_o  = rqstoe  ?  0 : 'bZ;
 

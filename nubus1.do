@@ -7,7 +7,7 @@ delete wave *
 
 add wave -divider "Simulate"
 
-add wave -hex sim:/nubus_vm2s_tb/fsm_tmode
+add wave -hex sim:/nubus_vm2s_tb/fsm_tm
 add wave -hex sim:/nubus_vm2s_tb/fsm_status
 
 # Nubus signals
@@ -21,6 +21,7 @@ add wave -hex sim:/nubus_vm2s_tb/UNuBus/nub_idn
 add wave -divider "Nubus Data"
 
 add wave -hex sim:/nubus_vm2s_tb/UNuBus/nub_adn
+add wave -hex sim:/nubus_vm2s_tb/UNuBus/address
 add wave -bin sim:/nubus_vm2s_tb/UNuBus/nub_rqstn
 add wave -bin sim:/nubus_vm2s_tb/UNuBus/nub_startn
 add wave -bin sim:/nubus_vm2s_tb/UNuBus/nub_ackn
@@ -66,4 +67,4 @@ add wave -bin sim:/nubus_vm2s_tb/UNuBus/cpu_lock
 add wave -divider "Debugging"
 
 
-$stop
+#$stop

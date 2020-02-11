@@ -70,20 +70,24 @@ module nubus
 
    wire           nub_clk = ~nub_clkn;
    wire           nub_reset = ~nub_resetn;
-   wire           nub_ad = ~nub_adn;
+
+   wire           slv_master, slv_slave;
+   wire           slv_tm1n, slv_tm0n;
+   wire           mst_adrcy, mst_dtacy;
+   wire           mst_tm1n;
 
    // ==========================================================================
    // Processor address bus buffers
    // ==========================================================================
 
-   reg [31:0]     address;
-   wire           nub_adwr = slv_slave & ~nub_startn;
+   reg [31:0]     nub_adi;
+   wire [31:0]    address = nub_adi;
    
-   always @(posedge ~nub_clk or posedge nub_reset) begin : proc_read_nub_ad
+   always @(negedge nub_clkn or posedge nub_reset) begin : proc_ad_slave
       if (nub_reset) begin
-         address <= 0;
-      end else if (nub_adwr) begin
-         address <= nub_ad;
+         nub_adi <= 0;
+      end else if (~nub_startn) begin
+         nub_adi <= ~nub_adn;
       end
    end
    
@@ -92,14 +96,15 @@ module nubus
    wire [31:0] busb     = slv_master ? mst_busb : slv_busb;
    wire        busbwr = mst_dtacy | mst_adrcy;
    
-   reg [31:0] nub_adoreg;
+   reg [31:0] nub_ado;
 
-   always @(posedge nub_clkn or posedge nub_reset) begin : proc_out_nub_ad
+   always @(negedge nub_clkn or posedge nub_reset) begin : proc_ad_master
       if (nub_reset) begin
-         nub_adoreg <= 0;
+         nub_ado <= 0;
       end else begin
-         if (busbwr)
-           nub_adoreg <= busb;
+         if (busbwr) begin
+           nub_ado <= busb;
+         end
       end
    end
    
@@ -112,7 +117,7 @@ module nubus
                 /*MASTER data cycle, when writing*/
                 ;
    // Output to nubus the 
-   assign nub_adn = gba ? ~nub_adoreg : 'bZ;
+   assign nub_adn = gba ? ~nub_ado : 'bZ;
 
    // ==========================================================================
    // Slot selection and expansion selection
@@ -141,9 +146,6 @@ module nubus
    // Slave FSM
    // ==========================================================================
 
-   wire           slv_master, slv_slave;
-   wire           slv_tm1n, slv_tm0n;
-   
    nubus_slave USlave
      (
       .nub_clkn(nub_clkn), // Clock
@@ -158,9 +160,9 @@ module nubus
 
       .slave_o(slv_slave), // Slave mode
       .master_o(slv_master), // MAster mode
-      .myslotln_o(slv_myslotln), 
-      .tmn1_o(slv_tmn1), // Latched transition mode 1 (Read/Write)
-      .tmn0_o(slv_tmn0),
+      .myslot_o(slv_myslot), 
+      .tm1n_o(slv_tm1n), // Latched transition mode 1 (Read/Write)
+      .tm0n_o(slv_tm0n),
       .ackcy_o(slv_ackcy)	// Acknowlege
       );
 
@@ -198,7 +200,7 @@ module nubus
 
    nubus_driver UNDriver
      (
-      .mst_ackcy(mst_ackcy), // Achnowlege
+      .slv_ackcy(slv_ackcy), // Achnowlege
       .mst_arbcy(mst_arbcy), // Arbiter enabled
       .mst_adrcy(mst_adrcy), // Address strobe
       .mst_dtacy(mst_dtacy), // Data strobe
@@ -209,11 +211,11 @@ module nubus
 
       .nub_tm0n_o(nub_tm0n), // Transfer mode
       .nub_tm1n_o(nub_tm1n), // Transfer mode
-      .nub_tmoe_o(nub_tmoen), // Transfer mode enable
-      .nub_ack_o(nub_ackn), // Achnowlege
-      .nub_start_o(startn), // Transfer start
+      .nub_ackn_o(nub_ackn), // Achnowlege
+      .nub_start_o(nub_startn), // Transfer start
       .nub_rqst_o(nub_rqstn), // Bus request
       .nub_rqstoe_o(nub_qstoe), // Bus request enable
+      .drv_tmoe_o(drv_tmoen), // Transfer mode enable
       .drv_mstdn_o(drv_mstdn) // Guess: Slave sends /ACK. Master responds with /MSTDN, which allows slave to clear /ACK and listen for next transaction.
       );
 

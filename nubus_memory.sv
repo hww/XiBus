@@ -63,23 +63,22 @@ module nubus_memory
    end // always @ (negedge clk)
 
    // Acknowledge for memory access 
-   wire [4:0] ready;
-   reg [3:0]  readyd;
-   
-   assign ready[0] = mem_valid;
-   assign ready[3:0] = readyd;
+   reg ready1, ready2, ready3;
    
    always @(posedge mem_clk or posedge mem_reset) begin
       if (mem_reset) begin
-         readyd <= 0;
+         ready1 <= 0;
+         ready2 <= 0;
+         ready3 <= 0;
       end else begin
-         readyd[0] <= ready[0];
-         readyd[1] <= readyd[0] & mem_valid;
-         readyd[2] <= readyd[1] & mem_valid;
-         readyd[3] <= readyd[2] & mem_valid;
+         ready1 <= mem_valid;
+         ready2 <= ready1 & mem_valid;
+         ready3 <= ready2 & mem_valid;
       end 
    end // always @ (posedge mem_clkn or negedge mem_resetn)
 
+   wire [3:0] ready = { ready3, ready2, ready1, mem_valid };
+   
    assign mem_ready_o = ready[WAIT_CLOCKS];
 
 endmodule

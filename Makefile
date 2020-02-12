@@ -7,11 +7,11 @@ ICARUS_FLAGS = -g2012
 # ==========================================
 
 nubus_slave: nubus_slave_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv
-	iverilog $(ICARUS_FLAGS) -o nubus_vm2s_tb.vvp $^ 
+	iverilog $(ICARUS_FLAGS) -o nubus_slave_tb.vvp $^ 
 
 test_slave.vvp: nubus_slave_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv
-	iverilog $(ICARUS_FLAGS) -o nubus_vm2s_tb.vvp $^
-	vvp nubus_vm2s_tb.vvp
+	iverilog $(ICARUS_FLAGS) -o nubus_svave_tb.vvp $^
+	vvp nubus_slave_tb.vvp
 
 # ==========================================
 # Test only for the arbiter

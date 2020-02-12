@@ -2,7 +2,7 @@
 
 module nubus_vm2s_tb ();
 
-`include "nubus.sv"
+`include "nubus_inc.sv"
 
    parameter TEST_CARD_ID    = 'h0;
    parameter TEST_ADDR = 'hF0000000;
@@ -148,43 +148,35 @@ module nubus_vm2s_tb ();
       @ (posedge nub_clkn);
         fsm_resetn <= 1;
       @ (posedge nub_clkn);
-      $display  ("WR WORD ---------------------------");
+      $display  ("WORD ---------------------------");
       write_word(TMAD_WR_WORD,   TEST_ADDR+0, TEST_DATA);
-      $display  ("RD WORD ---------------------------");
       read_word (TMAD_RD_WORD,   TEST_ADDR+0);
       check_word(TMAD_RD_WORD,   TEST_DATA);
-      $display  ("WR HALF 0 -------------------------");
+      $display  ("HALF 0 -------------------------");
       write_word(TMAD_WR_HALF_0, TEST_ADDR+4, TEST_DATA);
-      $display  ("RD HALF 0 -------------------------");
       read_word (TMAD_RD_HALF_0, TEST_ADDR+4);
       check_word(TMAD_RD_HALF_0, TEST_DATA);
-      $display  ("WR HALF 1 -------------------------");
+      $display  ("HALF 1 -------------------------");
       write_word(TMAD_WR_HALF_1, TEST_ADDR+8, TEST_DATA);
-      $display  ("RD HALF 1 -------------------------");
       read_word (TMAD_RD_HALF_1, TEST_ADDR+8);
       check_word(TMAD_RD_HALF_1, TEST_DATA);
 
-      $display  ("WR BYTE 0 -------------------------");
+      $display  ("BYTE 0 -------------------------");
       write_word(TMAD_WR_BYTE_0,  TEST_ADDR+12, TEST_DATA);
-      $display  ("RD BYTE 0 -------------------------");
       read_word (TMAD_RD_BYTE_0,  TEST_ADDR+12);
       check_word(TMAD_RD_BYTE_0,  TEST_DATA);
-      $display  ("WR BYTE 1 -------------------------");
+      $display  ("BYTE 1 -------------------------");
       write_word(TMAD_WR_BYTE_1,  TEST_ADDR+16, TEST_DATA);
-      $display  ("RD BYTE 1 -------------------------");
       read_word (TMAD_RD_BYTE_1,  TEST_ADDR+16);
       check_word(TMAD_RD_BYTE_1,  TEST_DATA);
-      $display  ("WR BYTE 2 -------------------------");
+      $display  ("BYTE 2 -------------------------");
       write_word(TMAD_WR_BYTE_2,  TEST_ADDR+20, TEST_DATA);
-      $display  ("RD BYTE 2 -------------------------");
       read_word (TMAD_RD_BYTE_2,  TEST_ADDR+20);
       check_word(TMAD_RD_BYTE_2,  TEST_DATA);
-      $display  ("WR BYTE 3 -------------------------");
+      $display  ("BYTE 3 -------------------------");
       write_word(TMAD_WR_BYTE_3,  TEST_ADDR+24, TEST_DATA);
-      $display  ("RD BYTE 3 -------------------------");
       read_word (TMAD_RD_BYTE_3,  TEST_ADDR+24);
       check_word(TMAD_RD_BYTE_3,  TEST_DATA);
-      $display  ("END -------------------------------");
       #1000;
 
       $finish;
@@ -200,7 +192,6 @@ module nubus_vm2s_tb ();
       input [31:0] addr;
       input [31:0] data;
       begin
-         $display ("%g write address: $%h tm: $%h data: $%h", $time, addr, tmad, data);
          fsm_datawr <= data;
          fsm_addr[31:2] <= addr[31:2];
          fsm_addr[ 1:0] <= tmad[1:0]; 
@@ -216,7 +207,7 @@ module nubus_vm2s_tb ();
             fsm_status <= ~{ nub_tm1n, nub_tm0n };
             @ (posedge nub_clkn);
          end while (fsm_acknd) ;
-         $display("%g write end            status: $%h ", $time, fsm_status);
+         $display ("%g  (write) address: $%h tm: $%h stat: %h data: $%h", $time, addr, tmad, fsm_status, data);
       end
    endtask
 
@@ -244,8 +235,7 @@ module nubus_vm2s_tb ();
             fsm_status <= ~{ nub_tm1n, nub_tm0n };
             @ (posedge nub_clkn);
          end while (fsm_acknd) ;
-
-         $display("%g read end             status: $%h     data: $%h", $time, fsm_status, fsm_datard);
+         $display ("%g  (read ) address: $%h tm: $%h stat: %h data: $%h", $time, addr, tmad, fsm_status, fsm_datard);
       end
    endtask
 
@@ -265,7 +255,7 @@ module nubus_vm2s_tb ();
          if (fsm_datard == expected)
            $display (":) PASSED");
          else
-           $display (":X FAILED expected: $%h found: $%h", expected, fsm_datard);
+           $display (":( FAILED expected: $%h found: $%h", expected, fsm_datard);
          $display("  ");         
       end
    endtask // verify

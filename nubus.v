@@ -61,7 +61,7 @@ module nubus
     output        mem_myexp
   );
 
-`include "nubus.sv"
+`include "nubus_inc.sv"
 
 
    // ==========================================================================

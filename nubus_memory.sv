@@ -47,7 +47,7 @@ module nubus_memory
       end else begin
          if (mem_valid) begin
            if (mem_write_o) begin
-              $display("memory[$%h] <= $%h strobes: %b ", ma, mem_wdata, mem_wstrb);
+              //$display("memory[$%h] <= $%h strobes: %b ", ma, mem_wdata, mem_wstrb);
               if (mem_wstrb[3])
                 memory[ma][31:24] <= mem_wdata[31:24];
               if (mem_wstrb[2])
@@ -57,7 +57,7 @@ module nubus_memory
               if (mem_wstrb[0])
                 memory[ma][7:0]   <= mem_wdata[7:0];
            end else begin // if ( write)
-              $display("memory[$%h] -> $%h strobes: %b ", ma, mem_rdata_o, mem_wstrb);
+              //$display("memory[$%h] -> $%h strobes: %b ", ma, mem_rdata_o, mem_wstrb);
            end
          end
       end

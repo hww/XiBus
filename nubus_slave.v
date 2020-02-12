@@ -54,18 +54,18 @@ module nubus_slave
          myslotl <= 0;
          mem_valid <= 0;
       end else begin
-	 slaven    <= reset
-		       /*initialization*/
-		       | slaven & ~start
-		       | slaven & ack
-		       | slaven & ~myslot
-		       /*holding; DeMorgan of START & ~ACK & MYSLOT*/
-		       | slave & ackcy
-		       /*clearing term*/
-		       ;
+	 slaven   <= reset
+		     /*initialization*/
+		     | slaven & ~start
+		     | slaven & ack
+		     | slaven & ~myslot
+		     /*holding; DeMorgan of START & ~ACK & MYSLOT*/
+		     | slave & ackcy
+		     /*clearing term*/
+		     ;
 
-	 ackcy     <=    start & mem_ready & myslot & ~slave
-                      |  ~mem_ready & slave;
+	 ackcy    <=  start & mem_ready & myslot & ~ackcy
+                      | ~start & mem_ready & myslot & ~ackcy;
 
          // tm1n is 1 - reading 
 	 tm1nl    <= reset

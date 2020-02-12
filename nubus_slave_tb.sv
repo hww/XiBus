@@ -7,6 +7,8 @@ module nubus_vm2s_tb ();
    parameter TEST_CARD_ID    = 'h0;
    parameter TEST_ADDR = 'hF0000000;
    parameter TEST_DATA = 'h87654321;
+   parameter [2:0]  MEMORY_WAIT_CLOCKS = 5;
+   
    
    // Slot Identificatjon
    tri1 [3:0]          nub_idn; 
@@ -296,7 +298,7 @@ module nubus_vm2s_tb ();
 
    wire mem_write; // unused, just for debugging 
    
-   nubus_memory NMem
+   nubus_memory NMem 
      (
       .mem_clk(~nub_clkn),
       .mem_reset(~nub_resetn),
@@ -307,6 +309,7 @@ module nubus_vm2s_tb ();
       .mem_rdata_o(mem_rdata),
       .mem_myslot(mem_myslot),
       .mem_myexp(mem_myexp),
+      .mem_wait_clocks(MEMORY_WAIT_CLOCKS),
       .mem_ready_o(mem_ready),
       .mem_write_o(mem_write)
       );

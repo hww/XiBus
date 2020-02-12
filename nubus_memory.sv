@@ -1,8 +1,7 @@
 module nubus_memory
   #(
     parameter MEMORY_W = 16,
-    parameter MEMORY_SIZE = 1<<MEMORY_W,
-    parameter WAIT_CLOCKS = 0
+    parameter MEMORY_SIZE = 1<<MEMORY_W
     )
 
    (
@@ -14,7 +13,7 @@ module nubus_memory
     input [31:0]  mem_wdata,
     input         mem_myslot,
     input         mem_myexp,
-
+    input [2:0]   mem_wait_clocks,
     output [31:0] mem_rdata_o,
     output        mem_ready_o,
     output        mem_write_o
@@ -64,24 +63,30 @@ module nubus_memory
    end // always @ (negedge clk)
 
    // Acknowledge for memory access 
-   reg ready1, ready2, ready3;
+   reg ready1, ready2, ready3, ready4, ready5, ready6; 
    
    always @(posedge mem_clk or posedge mem_reset) begin
       if (mem_reset) begin
          ready1 <= 0;
          ready2 <= 0;
          ready3 <= 0;
+         ready4 <= 0;
+         ready5 <= 0;
+         ready6 <= 0;
       end else begin
          ready1 <= mem_valid;
          ready2 <= ready1 & mem_valid;
          ready3 <= ready2 & mem_valid;
+         ready4 <= ready3 & mem_valid;
+         ready5 <= ready4 & mem_valid;
+         ready6 <= ready5 & mem_valid;
       end 
    end // always @ (posedge mem_clkn or negedge mem_resetn)
 
    wire one = 1;
 
-   wire [4:0] ready = { ready3, ready2, ready1, mem_valid, one };
+   wire [7:0] ready = { ready6, ready5, ready4, ready3, ready2, ready1, mem_valid, one };
    
-   assign mem_ready_o = ready[WAIT_CLOCKS];
+   assign mem_ready_o = ready[mem_wait_clocks];
 
 endmodule

@@ -20,38 +20,39 @@ module nubus_slave
    input  mstdn,
      
    output slave_o, // Slave mode
-   output master_o, // MAster mode
    output myslot_o,
    output tm1n_o,
    output tm0n_o,
-   output ackcy_o // Acknowlege
+   output ackcy_o, // Acknowlege
+   output mem_valid_o
    );
 
-   reg        slaven, mastern, myslotl, tm1nl, tm0nl, ackcy;
+   reg        slaven, mastern, myslotl, tm1nl, tm0nl, ackcy, mem_valid;
    
    assign slave_o = ~slaven;
-   assign master_o = ~mastern;
    assign myslot_o = myslotl;
    assign tm1n_o = tm1nl;
    assign tm0n_o = tm0nl;
    assign ackcy_o = ackcy;
-
+   assign mem_valid_o = mem_valid;
+   
    wire       clk = nub_clkn;
    wire       reset = ~nub_resetn;   
-   wire       master = mastern;
-   wire       ack = ~nub_ackn;
    wire       start = ~nub_startn;
+   wire       ack = ~nub_ackn;
    wire       tm1n = nub_tm1n;
    wire       tm0n = nub_tm0n;
+
+   wire       slave = ~slaven;
    
    always @(posedge clk or posedge reset) begin : proc_slave
       if (reset) begin
 	 slaven <= 1;
-	 mastern <= 1;
 	 tm1nl <= 1;
          tm0nl <= 1;
 	 ackcy <= 0;
          myslotl <= 0;
+         mem_valid <= 0;
       end else begin
 	 slaven    <= reset
 		       /*initialization*/
@@ -59,19 +60,12 @@ module nubus_slave
 		       | slaven & ack
 		       | slaven & ~myslot
 		       /*holding; DeMorgan of START & ~ACK & MYSLOT*/
-		       | ~slaven & ackcy
+		       | slave & ackcy
 		       /*clearing term*/
 		       ;
 
-	 mastern   <= reset
-		       /*initialization*/
-		       | mastern & slaven
-                       /*holding*/
-		       | master & mstdn
-		       /*clearing term, at end of MASTER cycle*/
-		       ;
-
-	 ackcy      <= mem_ready;
+	 ackcy     <=    start & mem_ready & myslot & ~slave
+                      |  ~mem_ready & slave;
 
          // tm1n is 1 - reading 
 	 tm1nl    <= reset
@@ -97,6 +91,9 @@ module nubus_slave
                       /*setting */
                       | myslotl & ~ack & ~reset;
          
+         mem_valid  <= start & ~ack & myslot * ~reset
+                       /*latching terms for memory access*/
+                      | mem_valid * ~ackcy;
       end
    end
 

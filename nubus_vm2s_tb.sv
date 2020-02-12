@@ -46,9 +46,9 @@ module nubus_vm2s_tb ();
    tri1                mem_myslot;
    tri1                mem_myexp;
 
-   tri1                cpu_valid;
+   tri0                cpu_valid;
    tri1 [31:0]         cpu_addr;
-   tri1 [31:0]         cpu_wdata;
+   tri0 [31:0]         cpu_wdata;
    tri1                cpu_ready;
    tri1 [3:0]          cpu_wstrb;
    tri1 [31:0]         cpu_rdata;
@@ -96,6 +96,11 @@ module nubus_vm2s_tb ();
       .cpu_lock(cpu_lock)
       );
 
+   // Disabale CPU
+
+   assign cpu_valid = 0;
+   
+   
    // States of the state machine
    parameter FSM_WRITE_START = 3;
    parameter FSM_WRITE_END = 4;
@@ -254,13 +259,14 @@ module nubus_vm2s_tb ();
       input [3:0]  tm,
       input [31:0] data_wr
       );
-      reg          expected;
+      reg [31:0]   expected;
       begin
          expected = (data_wr & get_mask(tm));
          if (fsm_datard == expected)
-           $display ("PASSED");
+           $display (":) PASSED");
          else
-           $display ("FAILED expected: $%h found: $%h", expected, fsm_datard);
+           $display (":X FAILED expected: $%h found: $%h", expected, fsm_datard);
+         $display("  ");         
       end
    endtask // verify
 

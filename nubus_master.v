@@ -31,7 +31,6 @@ module nubus_master
    input  nub_rqstn, // Bus request
    input  nub_startn, // Start transfer
    input  nub_ackn, // End of transfer
-   input  slv_master, // Slv_master mode
    input  arb_grant, // Grant access
    input  cpu_lock, // Locked by CPU
    input  cpu_valid, // Slv_master mode access
@@ -42,7 +41,7 @@ module nubus_master
    output owner_o, // Address or data transfer
    output dtacy_o, // Data strobe
    output adrcy_o, // Address strobe
-   output arbcy_o,	// Arbiter enabled
+   output arbcy_o, // Arbiter enabled
    output tm1n_o,
    output tm0n_o
    );
@@ -65,8 +64,9 @@ module nubus_master
 
    assign tm1n_o = 0;
    assign tm0n_o = 0;
- 
-   always @(posedge clkn or posedge reset) begin : proc_slv_master
+   wire slv_master = 1;
+   
+   always @(posedge clkn or posedge reset) begin : proc_master
       if(reset) begin
 	       arbcy 	<= 0;
 	       adrcy 	<= 0;
@@ -77,7 +77,8 @@ module nubus_master
 	       locked <= 0;
       end else begin
 
-	 arbcy  <= slv_master & cpu_valid & ~owner & ~arbcy & ~adrcy & ~dtacy & ~rqst
+	 arbcy  <= slv_master &
+ cpu_valid & ~owner & ~arbcy & ~adrcy & ~dtacy & ~rqst
 		   /*wait for RQST& unsserted, while idle*/
 		   | slv_master & arbcy & ~owner & ~reset
 		   /*non-locking, hold for START&*/

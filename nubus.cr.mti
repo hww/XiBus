@@ -1,23 +1,9 @@
-D:/projects/github/nubus/nubus_driver.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_driver.v
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module nubus_driver
-
-Top level modules:
-	nubus_driver
-
-} {} {}} D:/projects/github/nubus/nubus_vm2s_tb.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_vm2s_tb.sv
+D:/projects/github/nubus/nubus_vm2s_tb.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_vm2s_tb.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
 -- Compiling module nubus_vm2s_tb
 
 Top level modules:
 	nubus_vm2s_tb
-
-} {} {}} D:/projects/github/nubus/nubus_memory.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_memory.sv
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module nubus_memory
-
-Top level modules:
-	nubus_memory
 
 } {} {}} D:/projects/github/nubus/nubus_master.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_master.v
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
@@ -26,12 +12,63 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 Top level modules:
 	nubus_master
 
-} {} {}} D:/projects/github/nubus/nubus_arbiter.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_arbiter.v
+} {} {}} D:/projects/github/nubus/nubus_driver.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_driver.v
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module nubus_arbiter
+-- Compiling module nubus_driver
 
 Top level modules:
-	nubus_arbiter
+	nubus_driver
+
+} {} {}} D:/projects/github/nubus/nubus.v {2 {vlog -work work -stats=none D:/projects/github/nubus/nubus.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module nubus
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(4): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(5): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(6): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(7): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(8): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(9): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(10): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(11): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(13): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(14): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(15): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(16): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(17): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(18): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(19): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(20): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(22): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(25): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(28): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(29): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(30): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(64)
+** at nubus.sv(31): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+
+Top level modules:
+	nubus
 
 } {} {}} D:/projects/github/nubus/nubus_arbiter_tb.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_arbiter_tb.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
@@ -40,6 +77,13 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 
 Top level modules:
 	nubus_arbiter_tb
+
+} {} {}} D:/projects/github/nubus/nubus_arbiter.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_arbiter.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module nubus_arbiter
+
+Top level modules:
+	nubus_arbiter
 
 } {} {}} D:/projects/github/nubus/nubus_slave.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_slave.v
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016

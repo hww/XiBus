@@ -5,7 +5,7 @@ onElabError resume;
 #vcom *.sv
 
 # Load testbench for simulation
-vsim -gui  -onfinish stop work.nubus_vm2s_tb
+vsim -gui -onfinish exit work.nubus_vm2s_tb
 
 # Tell modelsim to record everything
 log * -r
@@ -80,25 +80,6 @@ add wave -bin -group CPU sim:/nubus_vm2s_tb/UNuBus/cpu_lock
     
 add wave -divider "Debugging"
 
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/nub_clkn
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/nub_resetn
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/nub_rqstn
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/nub_startn
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/nub_ackn
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/arb_grant
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/cpu_lock
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/cpu_valid
-
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/locked_o
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/arbdn_o
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/busy_o
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/owner_o
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/dtacy_o
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/adrcy_o
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/arbcy_o
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/tm1n_o
-add wave -bin -group Master sim:/nubus_vm2s_tb/UNuBus/UMaster/tm0n_o
-
 add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/nub_clkn
 add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/nub_resetn
 add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/nub_startn
@@ -110,6 +91,7 @@ add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/myslot
 add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/mstdn
 
 add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/slave_o
+add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/master_o
 add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/myslot_o
 add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/tm0n_o
 add wave -bin -group Slave sim:/nubus_vm2s_tb/UNuBus/USlave/tm1n_o

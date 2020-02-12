@@ -1,6 +1,7 @@
 module nubus_memory
   #(
     parameter MEMORY_W = 16,
+    parameter MEMORY_SIZE = 1<<MEMORY_W,
     parameter WAIT_CLOCKS = 0
     )
 
@@ -20,7 +21,7 @@ module nubus_memory
     );
 
    // Declarate a memory buffer
-   reg [31:0] memory[MEMORY_W-1:0];
+   reg [31:0] memory[MEMORY_SIZE-1:0];
 
    // Make the memory's addres
    wire [MEMORY_W-1:0] ma = mem_addr & 'hFFFFFFFC;
@@ -40,7 +41,7 @@ module nubus_memory
    always @(posedge mem_clk or posedge mem_reset) begin
       if (mem_reset) begin
          // clear memory
-         for (tmpidx=0; tmpidx < (1 << MEMORY_W); tmpidx = tmpidx + 1) begin
+         for (tmpidx=0; tmpidx < MEMORY_SIZE; tmpidx = tmpidx + 1) begin
             memory[tmpidx] <= 0;
          end
       end else begin
@@ -77,7 +78,9 @@ module nubus_memory
       end 
    end // always @ (posedge mem_clkn or negedge mem_resetn)
 
-   wire [3:0] ready = { ready3, ready2, ready1, mem_valid };
+   wire one = 1;
+
+   wire [4:0] ready = { ready3, ready2, ready1, mem_valid, one };
    
    assign mem_ready_o = ready[WAIT_CLOCKS];
 

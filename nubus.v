@@ -92,21 +92,9 @@ module nubus
    end
    
    wire [31:0] slv_busb = mem_rdata;
-   wire [31:0] mst_busb = mst_adrcy  ? cpu_addr : cpu_wdata;
-   wire [31:0] busb     = slv_master ? mst_busb : slv_busb;
+   wire [31:0] mst_busb = mst_adrcy ? cpu_addr : cpu_wdata;
+   wire [31:0] busb     = slv_slave ? slv_busb : mst_busb;
    wire        busbwr = mst_dtacy | mst_adrcy;
-   
-   reg [31:0] nub_ado;
-
-   always @(negedge nub_clkn or posedge nub_reset) begin : proc_ad_master
-      if (nub_reset) begin
-         nub_ado <= 0;
-      end else begin
-         if (busbwr) begin
-           nub_ado <= busb;
-         end
-      end
-   end
    
    // When 1 - drive the NuBus AD lines 
    assign gba =   slv_slave  & slv_tm1n
@@ -117,7 +105,7 @@ module nubus
                 /*MASTER data cycle, when writing*/
                 ;
    // Output to nubus the 
-   assign nub_adn = gba ? ~nub_ado : 'bZ;
+   assign nub_adn = gba ? ~busb : 'bZ;
 
    // ==========================================================================
    // Slot selection and expansion selection
@@ -159,11 +147,11 @@ module nubus
       .mstdn(drv_mstdn),
 
       .slave_o(slv_slave), // Slave mode
-      .master_o(slv_master), // MAster mode
       .myslot_o(slv_myslot), 
       .tm1n_o(slv_tm1n), // Latched transition mode 1 (Read/Write)
       .tm0n_o(slv_tm0n),
-      .ackcy_o(slv_ackcy)	// Acknowlege
+      .ackcy_o(slv_ackcy), // Acknowlege
+      .mem_valid_o(mem_valid)
       );
 
    // ==========================================================================
@@ -177,7 +165,6 @@ module nubus
       .nub_rqstn(nub_rqstn), // Bus request
       .nub_startn(nub_startn), // Start transfer
       .nub_ackn(nub_ackn), // End of transfer
-      .slv_master(slv_master), // Master mode
       .arb_grant(arb_grant), // Grant access
       .cpu_lock(cpu_lock), // Address line
       .cpu_valid(cpu_valid), // Master mode (delayed)
@@ -230,7 +217,6 @@ module nubus
    assign mem_addr = address;
    assign mem_wdata = ~nub_adn;
 
-   assign mem_valid = slv_slave; // FIX ME should be somthing different
    assign write = mem_valid & ~slv_tm1n;
 
    assign mem_wstrb[3]   =     write & ~a1ln & ~a0ln & ~slv_tm0n

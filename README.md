@@ -4,8 +4,12 @@ Implementation of NuBus controller with Verilog
 ## ToDo List
 
 - [x] Arbiter
+- [x] Arbiter test bench
 - [x] Slave
+- [x] Slave test bench
 - [ ] Master
+- [x] Master test bench
+- [ ] Multimaster bus transfer
 - [ ] Errors
 - [ ] Interrupts 
 - [ ] Parity

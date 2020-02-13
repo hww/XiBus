@@ -116,6 +116,8 @@ module nubus_master_tb ();
    assign cpu_wdata = tst_wdata;
    assign cpu_addr = tst_addr;
    assign cpu_lock = tst_lock;
+   assign cpu_ready = tst_ready;
+
    
    initial begin
       $display ("Start CPU->NuBusMaster->NuBusSlave");

@@ -7,7 +7,7 @@ Implementation of NuBus controller with Verilog
   - [x] Arbiter testbench
 - [x] Slave
   - [x] Slave testbench
-- [ ] Master
+- [x] Master
   - [x] Master testbench
   - [ ] Multimaster bus transfer test bench
 - [ ] Bus transfer errors
@@ -37,6 +37,8 @@ nubus_slave_tb.sv - Slave controller test bench (virtual master access to slave)
 nubus_master_tb.sv - Master controller test bench (CPU access to slave with NuBus)
 
 nubus_memory.sv - Memory controller used for tests
+
+cpu_encoder.v - Encoder from PicoRV bus to this NuBus controller
 
 ## Makefile
 

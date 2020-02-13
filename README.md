@@ -37,3 +37,20 @@ nubus_slave_tb.sv - Slave controller test bench (virtual master access to slave)
 nubus_master_tb.sv - Master controller test bench (CPU access to slave with NuBus)
 
 nubus_memory.sv - Memory controller used for tests
+
+## Makefile
+
+> make clean
+
+> make arbiter
+
+> make test_arbiter
+
+> make slave
+
+> make test_slave
+
+> make master
+
+> make test_master
+

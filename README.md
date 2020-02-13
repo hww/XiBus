@@ -38,7 +38,7 @@ nubus_master_tb.sv - Master controller test bench (CPU access to slave with NuBu
 
 nubus_memory.sv - Memory controller used for tests
 
-cpu_encoder.v - Encoder from PicoRV bus to this NuBus controller
+cpu_bus.v - Encoder from PicoRV bus to this NuBus controller
 
 ## Makefile
 

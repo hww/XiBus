@@ -17,7 +17,7 @@ module nubus_arbiter
    (
     input [3:0] nub_idn, // ID of this card
     inout [3:0] nub_arbn, // NuBus arbiter's lines
-    input       arb_ena, // enable arbitter
+    input       arbena, // enable arbitter
     output      arb_grant_o // Grant access
     );
 
@@ -37,20 +37,20 @@ module nubus_arbiter
    
    // ------------------------------------------
 
-   assign arb3 = arb_ena & ~idn[3];
+   assign arb3 = arbena & ~idn[3];
 
    assign arb2oen = idn[3] & ~arbn[3];
 
    // ------------------------------------------
 
-   assign arb2 = arb_ena & ~arb2oen & ~idn[2];
+   assign arb2 = arbena & ~arb2oen & ~idn[2];
    
    assign arb1oen = idn[3] & ~arbn[3] | 
                      idn[2] & ~arbn[2];
 
    // ------------------------------------------
 
-   assign arb1 = arb_ena & ~arb1oen & ~idn[1];
+   assign arb1 = arbena & ~arb1oen & ~idn[1];
    
    assign arb0oen = idn[3] & ~arbn[3] |
                      idn[2] & ~arbn[2] | 
@@ -58,13 +58,13 @@ module nubus_arbiter
 
    // ------------------------------------------
 
-   assign arb0 = arb_ena & ~arb0oen & ~idn[0];
+   assign arb0 = arbena & ~arb0oen & ~idn[0];
    
    assign grant_no = idn[3] & ~arbn[3] |
                      idn[2] & ~arbn[2] |
                      idn[1] & ~arbn[1] |
                      idn[0] & ~arbn[0];
    
-   assign arb_grant_o = arb_ena &  ~grant_no;
+   assign arb_grant_o = arbena &  ~grant_no;
    
 endmodule

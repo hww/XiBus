@@ -81,7 +81,7 @@ module nubus
 
    wire [31:0] cpu_ad;   
    wire [31:0] slv_busb = mem_rdata;
-   wire [31:0] busb     = mst_adrcy | (mst_dtacy & ~cpu_tm1n) ? cpu_ad : slv_busb;
+   wire [31:0] busb     = mst_adrcy | ~slv_slave ? cpu_ad : slv_busb;
    wire        busbwr = mst_dtacy | mst_adrcy;
    wire        mst_owner;
    
@@ -238,15 +238,13 @@ module nubus
    // CPU Interface
    // ==========================================================================
 
-   assign cpu_rdata = ~nub_adn;
-   
    cpu_encoder UCPU
      (
       .adrcy(mst_adrcy),
       .cpu_write(cpu_write),
       .cpu_addr(cpu_addr),
       .cpu_wdata(cpu_wdata),
-
+  
       .cpu_ad_o(cpu_ad),
       .tm1n_o(cpu_tm1n),
       .tm0n_o(cpu_tm0n),

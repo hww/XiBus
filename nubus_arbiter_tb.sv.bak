@@ -24,10 +24,10 @@ module nubus_arbiter_tb ();
    // instantiate arbiter 2
    nubus_arbiter UA2
      (
+      .arb_ena(enable2), 
       .nub_idn(id2), 
       .nub_arbn(arbn), 
-      .arb_ena(enable2), 
-      .arb_grant_o(grant2)
+      .grant_o(grant2)
       );
 
    // declarate register with IDs for the boards

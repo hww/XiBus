@@ -2,12 +2,12 @@
 
 module nubus_slave_tb ();
 
-`include "nubus_inc.sv"
+`include "nubus_tb_inc.sv"
 
    parameter TEST_CARD_ID    = 'h0;
    parameter TEST_ADDR = 'hF0000000;
    parameter TEST_DATA = 'h87654321;
-   parameter [2:0]  MEMORY_WAIT_CLOCKS = 5;   
+   parameter [1:0]  MEMORY_WAIT_CLOCKS = 1;   
    
    // Slot Identificatjon
    tri1 [3:0]          nub_idn; 
@@ -40,7 +40,7 @@ module nubus_slave_tb ();
    // SLave interface signals
    tri1                mem_valid;
    tri1                mem_ready;
-   tri1 [3:0]          mem_wstrb;
+   tri1 [3:0]          mem_write;
    tri1 [31:0]         mem_addr;
    tri1 [31:0]         mem_wdata;
    tri1 [31:0]         mem_rdata;
@@ -51,7 +51,7 @@ module nubus_slave_tb ();
    tri1 [31:0]         cpu_addr;
    tri0 [31:0]         cpu_wdata;
    tri1                cpu_ready;
-   tri1 [3:0]          cpu_wstrb;
+   tri1 [3:0]          cpu_write;
    tri1 [31:0]         cpu_rdata;
    tri1                cpu_lock;
 
@@ -80,7 +80,7 @@ module nubus_slave_tb ();
       // Slave device pins only
       .mem_valid(mem_valid),
       .mem_ready(mem_ready),
-      .mem_wstrb(mem_wstrb),
+      .mem_write(mem_write),
       .mem_addr(mem_addr),
       .mem_wdata(mem_wdata),
       .mem_rdata(mem_rdata),
@@ -92,7 +92,7 @@ module nubus_slave_tb ();
       .cpu_addr(cpu_addr),
       .cpu_wdata(cpu_wdata),
       .cpu_ready(cpu_ready),
-      .cpu_wstrb(cpu_wstrb),
+      .cpu_write(cpu_write),
       .cpu_rdata(cpu_rdata),
       .cpu_lock(cpu_lock)
       );
@@ -267,14 +267,14 @@ module nubus_slave_tb ();
    // Memory interface
    // ======================================================
 
-   wire mem_write; // unused, just for debugging 
+   wire mem_any_write; // unused, just for debugging 
    
    nubus_memory NMem 
      (
       .mem_clk(~nub_clkn),
       .mem_reset(~nub_resetn),
       .mem_valid(mem_valid),
-      .mem_wstrb(mem_wstrb),
+      .mem_write(mem_write),
       .mem_addr(mem_addr),
       .mem_wdata(mem_wdata),
       .mem_rdata_o(mem_rdata),
@@ -282,7 +282,7 @@ module nubus_slave_tb ();
       .mem_myexp(mem_myexp),
       .mem_wait_clocks(MEMORY_WAIT_CLOCKS),
       .mem_ready_o(mem_ready),
-      .mem_write_o(mem_write)
+      .mem_write_o(mem_any_write)
       );
 
 endmodule

@@ -2,12 +2,12 @@
 
 module nubus_master_tb ();
 
-`include "nubus_inc.sv"
+`include "nubus_tb_inc.sv"
 
    parameter TEST_CARD_ID    = 'h0;
    parameter TEST_ADDR = 'hF0000000;
    parameter TEST_DATA = 'h87654321;
-   parameter [2:0]  MEMORY_WAIT_CLOCKS = 5;
+   parameter [1:0]  MEMORY_WAIT_CLOCKS = 1;
    
    
    // Slot Identificatjon
@@ -41,7 +41,7 @@ module nubus_master_tb ();
    // SLave interface signals
    tri1                mem_valid;
    tri1                mem_ready;
-   tri1 [3:0]          mem_wstrb;
+   tri1 [3:0]          mem_write;
    tri1 [31:0]         mem_addr;
    tri1 [31:0]         mem_wdata;
    tri1 [31:0]         mem_rdata;
@@ -52,7 +52,7 @@ module nubus_master_tb ();
    tri1 [31:0]         cpu_addr;
    tri0 [31:0]         cpu_wdata;
    tri1                cpu_ready;
-   tri1 [3:0]          cpu_wstrb;
+   tri1 [3:0]          cpu_write;
    tri1 [31:0]         cpu_rdata;
    tri1                cpu_lock;
 
@@ -81,7 +81,7 @@ module nubus_master_tb ();
       // Slave device pins only
       .mem_valid(mem_valid),
       .mem_ready(mem_ready),
-      .mem_wstrb(mem_wstrb),
+      .mem_write(mem_write),
       .mem_addr(mem_addr),
       .mem_wdata(mem_wdata),
       .mem_rdata(mem_rdata),
@@ -93,7 +93,7 @@ module nubus_master_tb ();
       .cpu_addr(cpu_addr),
       .cpu_wdata(cpu_wdata),
       .cpu_ready(cpu_ready),
-      .cpu_wstrb(cpu_wstrb),
+      .cpu_write(cpu_write),
       .cpu_rdata(cpu_rdata),
       .cpu_lock(cpu_lock)
       );
@@ -105,18 +105,18 @@ module nubus_master_tb ();
    reg [31:0]  tst_addr;
    reg [31:0]  tst_wdata;
    reg [31:0]  tst_rdata;
-   reg         tst_ready; // half clk delayed ackn
+   reg         tst_acknd; // half clk delayed ackn
    reg         tst_lock;
 
    assign nub_clkn     = tst_clkn;
    assign nub_resetn   = tst_resetn;
 
    assign cpu_valid = tst_valid;
-   assign cpu_wstrb = tst_wstrb;
+   assign cpu_write = tst_wstrb;
    assign cpu_wdata = tst_wdata;
    assign cpu_addr = tst_addr;
    assign cpu_lock = tst_lock;
-   assign cpu_ready = tst_ready;
+   assign cpu_ready = ~nub_ackn;
 
    
    initial begin
@@ -131,7 +131,7 @@ module nubus_master_tb ();
       tst_rdata  <= 0;
       tst_valid <= 0;
       tst_wstrb <= 0;
-      tst_ready <= 0;
+      tst_acknd <= 1;
       tst_lock <= 0;
       
       @ (posedge nub_clkn);
@@ -141,32 +141,32 @@ module nubus_master_tb ();
       $display  ("WORD ---------------------------");
       write_word(WSTRB_WR_WORD,   TEST_ADDR+0, TEST_DATA);
       read_word (WSTRB_RD_WORD,   TEST_ADDR+0);
-      check_word(WSTRB_RD_WORD,   TEST_DATA);
+      check_word(WSTRB_WR_WORD,   TEST_DATA);
       $display  ("HALF 0 -------------------------");
       write_word(WSTRB_WR_HALF_0, TEST_ADDR+4, TEST_DATA);
       read_word (WSTRB_RD_HALF_0, TEST_ADDR+4);
-      check_word(WSTRB_RD_HALF_0, TEST_DATA);
+      check_word(WSTRB_WR_HALF_0, TEST_DATA);
       $display  ("HALF 1 -------------------------");
       write_word(WSTRB_WR_HALF_1, TEST_ADDR+8, TEST_DATA);
       read_word (WSTRB_RD_HALF_1, TEST_ADDR+8);
-      check_word(WSTRB_RD_HALF_1, TEST_DATA);
+      check_word(WSTRB_WR_HALF_1, TEST_DATA);
 
       $display  ("BYTE 0 -------------------------");
       write_word(WSTRB_WR_BYTE_0,  TEST_ADDR+12, TEST_DATA);
       read_word (WSTRB_RD_BYTE_0,  TEST_ADDR+12);
-      check_word(WSTRB_RD_BYTE_0,  TEST_DATA);
+      check_word(WSTRB_WR_BYTE_0,  TEST_DATA);
       $display  ("BYTE 1 -------------------------");
       write_word(WSTRB_WR_BYTE_1,  TEST_ADDR+16, TEST_DATA);
       read_word (WSTRB_RD_BYTE_1,  TEST_ADDR+16);
-      check_word(WSTRB_RD_BYTE_1,  TEST_DATA);
+      check_word(WSTRB_WR_BYTE_1,  TEST_DATA);
       $display  ("BYTE 2 -------------------------");
       write_word(WSTRB_WR_BYTE_2,  TEST_ADDR+20, TEST_DATA);
       read_word (WSTRB_RD_BYTE_2,  TEST_ADDR+20);
-      check_word(WSTRB_RD_BYTE_2,  TEST_DATA);
+      check_word(WSTRB_WR_BYTE_2,  TEST_DATA);
       $display  ("BYTE 3 -------------------------");
       write_word(WSTRB_WR_BYTE_3,  TEST_ADDR+24, TEST_DATA);
       read_word (WSTRB_RD_BYTE_3,  TEST_ADDR+24);
-      check_word(WSTRB_RD_BYTE_3,  TEST_DATA);
+      check_word(WSTRB_WR_BYTE_3,  TEST_DATA);
       #1000;
 
       $finish;
@@ -186,12 +186,12 @@ module nubus_master_tb ();
          tst_wdata <= data;
          tst_wstrb <= wstrb;
          tst_valid <= 1;
-         tst_ready <= 0;
+         tst_acknd <= 1;
          do begin
             @ (negedge nub_clkn);
-            tst_ready <= cpu_ready;
+            tst_acknd <= nub_ackn;
             @ (posedge nub_clkn);
-         end while (~tst_ready);
+         end while (tst_acknd);
          tst_valid <= 0;
          tst_wstrb <= 0;
          $display ("%g  (write) address: $%h wstrb: $%b data: $%h", $time, addr, wstrb, data);
@@ -209,13 +209,13 @@ module nubus_master_tb ();
          tst_addr <= addr;
          tst_wstrb <= 0;
          tst_valid <= 1;
-         tst_ready <= 0;
+         tst_acknd <= 1;
          do begin
             @ (negedge nub_clkn);
             tst_rdata <= cpu_rdata;
-            tst_ready <= cpu_ready;
+            tst_acknd <= nub_ackn;
             @ (posedge nub_clkn);
-         end while (~tst_ready) ;
+         end while (tst_acknd) ;
          tst_valid <= 0;
          $display ("%g  (read ) address: $%h wstrb: $%b data: $%h", $time, addr, wstrb, tst_rdata);
       end
@@ -228,15 +228,18 @@ module nubus_master_tb ();
 
    task check_word
      (
-      input [3:0]  wstrb,
+      input [3:0]  write,
       input [31:0] wdata
       );
       reg [31:0]   expected;
       begin
-         expected[ 7: 0] = wstrb[0] ? wdata[ 7: 0] : 0;
-         expected[15: 8] = wstrb[0] ? wdata[15: 8] : 0;
-         expected[23:16] = wstrb[0] ? wdata[23:16] : 0;
-         expected[31:24] = wstrb[0] ? wdata[31:24] : 0;
+         $display("$%h", write);
+         
+         expected[ 7: 0] = write[0] ? wdata[ 7: 0] : 0;
+         expected[15: 8] = write[1] ? wdata[15: 8] : 0;
+         expected[23:16] = write[2] ? wdata[23:16] : 0;
+         expected[31:24] = write[3] ? wdata[31:24] : 0;
+         $display("$%h",expected);
          if (tst_rdata == expected)
            $display (":) PASSED");
          else
@@ -260,14 +263,14 @@ module nubus_master_tb ();
    // Memory interface
    // ======================================================
 
-   wire mem_write; // unused, just for debugging 
+   wire mem_any_write; // unused, just for debugging 
    
    nubus_memory NMem 
      (
       .mem_clk(~nub_clkn),
       .mem_reset(~nub_resetn),
       .mem_valid(mem_valid),
-      .mem_wstrb(mem_wstrb),
+      .mem_write(mem_write),
       .mem_addr(mem_addr),
       .mem_wdata(mem_wdata),
       .mem_rdata_o(mem_rdata),
@@ -275,7 +278,7 @@ module nubus_master_tb ();
       .mem_myexp(mem_myexp),
       .mem_wait_clocks(MEMORY_WAIT_CLOCKS),
       .mem_ready_o(mem_ready),
-      .mem_write_o(mem_write)
+      .mem_write_o(mem_any_write)
       );
 
 endmodule

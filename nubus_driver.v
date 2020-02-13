@@ -34,8 +34,8 @@ module nubus_driver
    output nub_tm0n_o, // Transfer mode
    output nub_tm1n_o, // Transfer mode
    output nub_ackn_o, // Achnowlege
-   output nub_start_o, // Transfer start
-   output nub_rqst_o, // Bus request
+   output nub_startn_o, // Transfer start
+   output nub_rqstn_o, // Bus request
    output nub_rqstoe_o, // Bus request enable
    output drv_tmoe_o, // Transfer mode enable
    output drv_mstdn_o // Guess: Slave sends /ACK. Master responds with /MSTDN, which allows slave to clear /ACK and listen for next transaction.

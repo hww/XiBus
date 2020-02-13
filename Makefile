@@ -14,6 +14,17 @@ test_slave.vvp: nubus_slave_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arb
 	vvp nubus_slave_tb.vvp
 
 # ==========================================
+# Test access NuBus Master to same NuBus slave
+# ==========================================
+
+nubus_master: nubus_master_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv 
+	iverilog $(ICARUS_FLAGS) -o nubus_master_tb.vvp $^ 
+
+test_master.vvp: nubus_master_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv
+	iverilog $(ICARUS_FLAGS) -o nubus_master_tb.vvp $^
+	vvp nubus_master_tb.vvp
+
+# ==========================================
 # Test only for the arbiter
 # ==========================================
 
@@ -38,6 +49,7 @@ test_arbiter.vvp:
 # ==========================================
 
 clean:
+	rm -f *.vcd
 	rm -f *.vvp
 	rm -f *.exe
 	rm -rf $(VERILATOR_DIR)

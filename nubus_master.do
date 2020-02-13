@@ -5,7 +5,7 @@ onElabError resume;
 #vcom *.sv
 
 # Load testbench for simulation
-vsim -gui -onfinish exit work.nubus_slave_tb
+vsim -gui -onfinish exit work.nubus_master_tb
 
 # Tell modelsim to record everything
 log * -r

@@ -1,13 +1,14 @@
 `timescale 1 ns / 1 ps
 
-module nubus_slave_tb ();
+module nubus_master_tb ();
 
 `include "nubus_inc.sv"
 
    parameter TEST_CARD_ID    = 'h0;
    parameter TEST_ADDR = 'hF0000000;
    parameter TEST_DATA = 'h87654321;
-   parameter [2:0]  MEMORY_WAIT_CLOCKS = 5;   
+   parameter [2:0]  MEMORY_WAIT_CLOCKS = 5;
+   
    
    // Slot Identificatjon
    tri1 [3:0]          nub_idn; 
@@ -97,35 +98,28 @@ module nubus_slave_tb ();
       .cpu_lock(cpu_lock)
       );
 
-   // Disabale CPU bus
-   assign cpu_valid = 0;
-
    reg         tst_clkn;
    reg         tst_resetn;
-   reg         tst_start;
-   reg [1:0]   tst_tm;
-   reg [1:0]   tst_status;
+   reg         tst_valid;
+   reg [3:0]   tst_wstrb;
    reg [31:0]  tst_addr;
    reg [31:0]  tst_wdata;
    reg [31:0]  tst_rdata;
-   reg         tst_acknd; // half clk delayed ackn
-   wire [1:0]  tst_tmn = ~tst_tm;
-
+   reg         tst_ready; // half clk delayed ackn
+   reg         tst_lock;
 
    assign nub_clkn     = tst_clkn;
    assign nub_resetn   = tst_resetn;
-   assign nub_startn   = ~tst_start;
-   
-   assign nub_tm0n     = tst_start ? tst_tmn[0] : 'bZ;
-   assign nub_tm1n     = tst_start ? tst_tmn[1] : 'bZ;
-   
-   wire [31:0] tst_ad = tst_start ? tst_addr : tst_wdata;
-   wire tst_nuboe = tst_start | tst_tm[1];
-   assign nub_adn     = tst_nuboe ? ~tst_ad : 'bZ;
+
+   assign cpu_valid = tst_valid;
+   assign cpu_wstrb = tst_wstrb;
+   assign cpu_wdata = tst_wdata;
+   assign cpu_addr = tst_addr;
+   assign cpu_lock = tst_lock;
    
    initial begin
-      $display ("Start VirtualMaster write to NubusSlave");
-      $dumpfile("nubus_slave_tb.vcd");
+      $display ("Start CPU->NuBusMaster->NuBusSlave");
+      $dumpfile("nubus_master_tb.vcd");
       $dumpvars;
 
       tst_clkn <= 1;
@@ -133,43 +127,44 @@ module nubus_slave_tb ();
       tst_addr <= 0;
       tst_wdata <= 0;
       tst_rdata  <= 0;
-      tst_start <= 0;
-      tst_status <= TM_NOP;
-      tst_tm <= TM_NOP;
-
+      tst_valid <= 0;
+      tst_wstrb <= 0;
+      tst_ready <= 0;
+      tst_lock <= 0;
+      
       @ (posedge nub_clkn);
       @ (posedge nub_clkn);
-        tst_resetn <= 1;
+      tst_resetn <= 1;
       @ (posedge nub_clkn);
       $display  ("WORD ---------------------------");
-      write_word(TMAD_WR_WORD,   TEST_ADDR+0, TEST_DATA);
-      read_word (TMAD_RD_WORD,   TEST_ADDR+0);
-      check_word(TMAD_RD_WORD,   TEST_DATA);
+      write_word(WSTRB_WR_WORD,   TEST_ADDR+0, TEST_DATA);
+      read_word (WSTRB_RD_WORD,   TEST_ADDR+0);
+      check_word(WSTRB_RD_WORD,   TEST_DATA);
       $display  ("HALF 0 -------------------------");
-      write_word(TMAD_WR_HALF_0, TEST_ADDR+4, TEST_DATA);
-      read_word (TMAD_RD_HALF_0, TEST_ADDR+4);
-      check_word(TMAD_RD_HALF_0, TEST_DATA);
+      write_word(WSTRB_WR_HALF_0, TEST_ADDR+4, TEST_DATA);
+      read_word (WSTRB_RD_HALF_0, TEST_ADDR+4);
+      check_word(WSTRB_RD_HALF_0, TEST_DATA);
       $display  ("HALF 1 -------------------------");
-      write_word(TMAD_WR_HALF_1, TEST_ADDR+8, TEST_DATA);
-      read_word (TMAD_RD_HALF_1, TEST_ADDR+8);
-      check_word(TMAD_RD_HALF_1, TEST_DATA);
+      write_word(WSTRB_WR_HALF_1, TEST_ADDR+8, TEST_DATA);
+      read_word (WSTRB_RD_HALF_1, TEST_ADDR+8);
+      check_word(WSTRB_RD_HALF_1, TEST_DATA);
 
       $display  ("BYTE 0 -------------------------");
-      write_word(TMAD_WR_BYTE_0,  TEST_ADDR+12, TEST_DATA);
-      read_word (TMAD_RD_BYTE_0,  TEST_ADDR+12);
-      check_word(TMAD_RD_BYTE_0,  TEST_DATA);
+      write_word(WSTRB_WR_BYTE_0,  TEST_ADDR+12, TEST_DATA);
+      read_word (WSTRB_RD_BYTE_0,  TEST_ADDR+12);
+      check_word(WSTRB_RD_BYTE_0,  TEST_DATA);
       $display  ("BYTE 1 -------------------------");
-      write_word(TMAD_WR_BYTE_1,  TEST_ADDR+16, TEST_DATA);
-      read_word (TMAD_RD_BYTE_1,  TEST_ADDR+16);
-      check_word(TMAD_RD_BYTE_1,  TEST_DATA);
+      write_word(WSTRB_WR_BYTE_1,  TEST_ADDR+16, TEST_DATA);
+      read_word (WSTRB_RD_BYTE_1,  TEST_ADDR+16);
+      check_word(WSTRB_RD_BYTE_1,  TEST_DATA);
       $display  ("BYTE 2 -------------------------");
-      write_word(TMAD_WR_BYTE_2,  TEST_ADDR+20, TEST_DATA);
-      read_word (TMAD_RD_BYTE_2,  TEST_ADDR+20);
-      check_word(TMAD_RD_BYTE_2,  TEST_DATA);
+      write_word(WSTRB_WR_BYTE_2,  TEST_ADDR+20, TEST_DATA);
+      read_word (WSTRB_RD_BYTE_2,  TEST_ADDR+20);
+      check_word(WSTRB_RD_BYTE_2,  TEST_DATA);
       $display  ("BYTE 3 -------------------------");
-      write_word(TMAD_WR_BYTE_3,  TEST_ADDR+24, TEST_DATA);
-      read_word (TMAD_RD_BYTE_3,  TEST_ADDR+24);
-      check_word(TMAD_RD_BYTE_3,  TEST_DATA);
+      write_word(WSTRB_WR_BYTE_3,  TEST_ADDR+24, TEST_DATA);
+      read_word (WSTRB_RD_BYTE_3,  TEST_ADDR+24);
+      check_word(WSTRB_RD_BYTE_3,  TEST_DATA);
       #1000;
 
       $finish;
@@ -181,26 +176,23 @@ module nubus_slave_tb ();
    // ======================================================
 
    task write_word;
-      input [3:0]  tmad;
+      input [3:0]  wstrb;
       input [31:0] addr;
       input [31:0] data;
       begin
+         tst_addr <= addr;
          tst_wdata <= data;
-         tst_addr[31:2] <= addr[31:2];
-         tst_addr[ 1:0] <= tmad[1:0]; 
-         tst_tm <= tmad[3:2];
-         tst_start <= 1;
-         tst_status <= TM_NOP;
-         @ (posedge nub_clkn);
-         tst_start <= 0;
-         tst_acknd <= nub_ackn;
+         tst_wstrb <= wstrb;
+         tst_valid <= 1;
+         tst_ready <= 0;
          do begin
             @ (negedge nub_clkn);
-            tst_acknd <= nub_ackn;
-            tst_status <= ~{ nub_tm1n, nub_tm0n };
+            tst_ready <= cpu_ready;
             @ (posedge nub_clkn);
-         end while (tst_acknd) ;
-         $display ("%g  (write) address: $%h tm: $%h data: $%h stat: %s", $time, addr, tmad, data, get_status_str(tst_status));
+         end while (~tst_ready);
+         tst_valid <= 0;
+         tst_wstrb <= 0;
+         $display ("%g  (write) address: $%h wstrb: $%b data: $%h", $time, addr, wstrb, data);
       end
    endtask
 
@@ -209,25 +201,21 @@ module nubus_slave_tb ();
    // ======================================================
 
    task read_word;
-      input [3:0]  tmad;
+      input [3:0]  wstrb;
       input [31:0] addr;
       begin
-         tst_addr[31:2] <= addr[31:2];
-         tst_addr[ 1:0] <= tmad[1:0];
-         tst_tm <= tmad[3:2];
-         tst_start <= 1;
-         tst_status <= TM_NOP;
-         @ (posedge nub_clkn);
-         tst_start <= 0;
-         tst_acknd <= nub_ackn;
+         tst_addr <= addr;
+         tst_wstrb <= 0;
+         tst_valid <= 1;
+         tst_ready <= 0;
          do begin
             @ (negedge nub_clkn);
-            tst_rdata <= ~nub_adn;
-            tst_acknd <= nub_ackn;
-            tst_status <= ~{ nub_tm1n, nub_tm0n };
+            tst_rdata <= cpu_rdata;
+            tst_ready <= cpu_ready;
             @ (posedge nub_clkn);
-         end while (tst_acknd) ;
-         $display ("%g  (read ) address: $%h tm: $%h data: $%h stat: %s", $time, addr, tmad, tst_rdata, get_status_str(tst_status));
+         end while (~tst_ready) ;
+         tst_valid <= 0;
+         $display ("%g  (read ) address: $%h wstrb: $%b data: $%h", $time, addr, wstrb, tst_rdata);
       end
    endtask
 
@@ -238,12 +226,15 @@ module nubus_slave_tb ();
 
    task check_word
      (
-      input [3:0]  tm,
-      input [31:0] data_wr
+      input [3:0]  wstrb,
+      input [31:0] wdata
       );
       reg [31:0]   expected;
       begin
-         expected = (data_wr & get_mask(tm));
+         expected[ 7: 0] = wstrb[0] ? wdata[ 7: 0] : 0;
+         expected[15: 8] = wstrb[0] ? wdata[15: 8] : 0;
+         expected[23:16] = wstrb[0] ? wdata[23:16] : 0;
+         expected[31:24] = wstrb[0] ? wdata[31:24] : 0;
          if (tst_rdata == expected)
            $display (":) PASSED");
          else

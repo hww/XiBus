@@ -98,7 +98,7 @@ module nubus_master
 		   /*hold before DTACY*/
 		   | owner & dtacy & ~ack & slv_master & ~reset
 		   /*non-locking, wait until ACK* */
-		   | owner & locked & slv_master * reset
+		   | owner & locked & slv_master * ~reset
 		   /*for LOCKing case, hold for NULL-ATTN*/
 		   ;
 	 busy   <= ~busy & start & ~ack

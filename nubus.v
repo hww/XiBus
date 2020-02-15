@@ -108,13 +108,13 @@ module nubus
    // Arbiter Interface
    // ==========================================================================
 
-   wire           mst_arbcyn, arb_grant;
+   wire           mst_arbcy, arb_grant;
 
    nubus_arbiter UArbiter
      (
       .idn(nub_idn),
       .arbn(nub_arbn),
-      .arbcyn(mst_arbcyn),
+      .arbcyn(~mst_arbcy),
       .grant(arb_grant)
       );
 

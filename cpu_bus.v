@@ -25,9 +25,9 @@ module cpu_bus
         case (cpu_write)
           'b0000: tmadn = 'b01111; // rd word 
           'b0001: tmadn = 'b00011; // wr byte 0
-          'b0010: tmadn = 'b00001; // wr byte 1
+          'b0010: tmadn = 'b00010; // wr byte 1
           'b0011: tmadn = 'b00110; // wr half 0
-          'b0100: tmadn = 'b00010; // wr byte 2
+          'b0100: tmadn = 'b00001; // wr byte 2
           'b0101: tmadn = 'b10000; // error
           'b0110: tmadn = 'b10000; // error
           'b0111: tmadn = 'b10000; // error

@@ -68,33 +68,32 @@ module nubus
    // Processor address bus buffers
    // ==========================================================================
 
-   reg [31:0]     nub_adi;
-   wire [31:0]    address = nub_adi;
+   reg [31:0]     slv_addr;
    
    always @(negedge nub_clkn or posedge nub_reset) begin : proc_ad_slave
       if (nub_reset) begin
-         nub_adi <= 0;
+         slv_addr <= 0;
       end else if (~nub_startn) begin
-         nub_adi <= ~nub_adn;
+         slv_addr <= ~nub_adn;
       end
    end
-
-   wire [31:0] cpu_ad;   
-   wire [31:0] slv_busb = mem_rdata;
-   wire [31:0] busb     = mst_adrcy | (mst_dtacy & ~cpu_tm1n) ? cpu_ad : slv_busb;
-   wire        busbwr = mst_dtacy | mst_adrcy;
+   
    wire        mst_owner;
+   wire [31:0] cpu_ad;
+   wire        cpu_adsel = mst_adrcy | mst_dtacy & ~cpu_tm1n;
+   // Select nubus data signals
+   wire [31:0] nub_ad   = cpu_adsel  ? cpu_ad : mem_rdata;
    
    // When 1 - drive the NuBus AD lines 
-   assign gba =   slv_slave  & slv_tm1n
-                /*SLAVE read of card*/
-                | cpu_valid & mst_adrcy
-                /*MASTER address cycle*/
-	        | mst_owner & mst_dtacy & ~cpu_tm1n
-                /*MASTER data cycle, when writing*/
-                ;
+   assign nub_adoe =   slv_slave  & slv_tm1n
+                       /*SLAVE read of card*/
+                       | cpu_valid & mst_adrcy
+                       /*MASTER address cycle*/
+	               | mst_owner & mst_dtacy & ~cpu_tm1n
+                       /*MASTER data cycle, when writing*/
+                       ;
    // Output to nubus the 
-   assign nub_adn = gba ? ~busb : 'bZ;
+   assign nub_adn = nub_adoe ? ~nub_ad : 'bZ;
 
    // ==========================================================================
    // Slot selection and expansion selection
@@ -102,21 +101,21 @@ module nubus
 
    // Card ID
    wire [3:0] nub_id = ~nub_idn;
-   assign mem_myslot = nub_id == address[27:24] & address[31:28] == SLOTS_ADDRESS;
-   assign mem_myexp = (address[31:28] & EXPANSION_MASK) == EXPANSION_ADDR;
+   assign mem_myslot = nub_id == slv_addr[27:24] & slv_addr[31:28] == SLOTS_ADDRESS;
+   assign mem_myexp = (slv_addr[31:28] & EXPANSION_MASK) == EXPANSION_ADDR;
 
    // ==========================================================================
    // Arbiter Interface
    // ==========================================================================
 
-   wire           mst_arbcy, arb_grant;
+   wire           mst_arbcyn, arb_grant;
 
    nubus_arbiter UArbiter
      (
-      .nub_idn(nub_idn),
-      .nub_arbn(nub_arbn),
-      .arb_ena(mst_arbcy),
-      .arb_grant_o(arb_grant)
+      .idn(nub_idn),
+      .arbn(nub_arbn),
+      .arbcyn(mst_arbcyn),
+      .grant(arb_grant)
       );
 
    // ==========================================================================
@@ -198,9 +197,9 @@ module nubus
 
    wire write;
    wire a1ln, a0ln;
-   assign { a1ln, a0ln } = ~address[1:0];
+   assign { a1ln, a0ln } = ~slv_addr[1:0];
 
-   assign mem_addr = address;
+   assign mem_addr = slv_addr;
    assign mem_wdata = ~nub_adn;
 
    assign write = mem_valid & ~slv_tm1n;
@@ -239,8 +238,9 @@ module nubus
    // ==========================================================================
 
    assign cpu_rdata = ~nub_adn;
+   assign cpu_ready = ~nub_ackn & nub_startn;
    
-   cpu_encoder UCPU
+   cpu_bus UCPUBus
      (
       .adrcy(mst_adrcy),
       .cpu_write(cpu_write),

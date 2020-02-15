@@ -9,62 +9,53 @@
  * This version uses a new technique to minimize skews .
  */
 
-/* verilator lint_off UNUSED */
-/* verilator lint_off IMPLICIT */
-/* verilator lint_off UNOPT */
-
 module nubus_arbiter 
    (
-    input [3:0] nub_idn, // ID of this card
-    inout [3:0] nub_arbn, // NuBus arbiter's lines
-    input       arb_ena, // enable arbitter
-    output      arb_grant_o // Grant access
+    input [3:0] idn,    // ID of this card
+    inout [3:0] arbn,   // NuBus arbiter's lines
+    input       arbcyn, // enable arbitter
+    output      grant   // Grant access
     );
 
-   wire          arb2oen, arb1oen, arb0oen; 
+   wire          arb2oen, arb1oen, arb0oen;
    wire          arb3, arb2, arb1, arb0;
    wire          grant_no;
-   wire [3:0]    arbn;
-   wire [3:0]    idn;
-   
-   assign idn = nub_idn;
-   assign arbn = nub_arbn;
-   
-   assign nub_arbn[3] = arb3 ? 0 : 'bZ;
-   assign nub_arbn[2] = arb2 ? 0 : 'bZ;   
-   assign nub_arbn[1] = arb1 ? 0 : 'bZ;   
-   assign nub_arbn[0] = arb0 ? 0 : 'bZ; 
-   
+
+   assign arbn[3] = arb3 ? 0 : 'bZ;
+   assign arbn[2] = arb2 ? 0 : 'bZ;
+   assign arbn[1] = arb1 ? 0 : 'bZ;
+   assign arbn[0] = arb0 ? 0 : 'bZ;
+
    // ------------------------------------------
 
-   assign arb3 = arb_ena & ~idn[3];
+   assign arb3 = ~arbcyn & ~idn[3];
 
    assign arb2oen = idn[3] & ~arbn[3];
 
    // ------------------------------------------
 
-   assign arb2 = arb_ena & ~arb2oen & ~idn[2];
-   
-   assign arb1oen = idn[3] & ~arbn[3] | 
-                     idn[2] & ~arbn[2];
+   assign arb2 = ~arbcyn & ~arb2oen & ~idn[2];
+
+   assign arb1oen = idn[3] & ~arbn[3] |
+                    idn[2] & ~arbn[2];
 
    // ------------------------------------------
 
-   assign arb1 = arb_ena & ~arb1oen & ~idn[1];
-   
+   assign arb1 = ~arbcyn & ~arb1oen & ~idn[1];
+
    assign arb0oen = idn[3] & ~arbn[3] |
-                     idn[2] & ~arbn[2] | 
-                     idn[1] & ~arbn[1];
+                    idn[2] & ~arbn[2] |
+                    idn[1] & ~arbn[1];
 
    // ------------------------------------------
 
-   assign arb0 = arb_ena & ~arb0oen & ~idn[0];
-   
-   assign grant_no = idn[3] & ~arbn[3] |
-                     idn[2] & ~arbn[2] |
-                     idn[1] & ~arbn[1] |
-                     idn[0] & ~arbn[0];
-   
-   assign arb_grant_o = arb_ena &  ~grant_no;
-   
+   assign arb0 = ~arbcyn & ~arb0oen & ~idn[0];
+
+   assign grantn = idn[3] & ~arbn[3] |
+                   idn[2] & ~arbn[2] |
+                   idn[1] & ~arbn[1] |
+                   idn[0] & ~arbn[0];
+
+   assign grant = ~arbcyn &  ~grantn;
+
 endmodule

@@ -1,13 +1,13 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate /nubus_arbiter_tb/UA1/nub_idn
-add wave -noupdate /nubus_arbiter_tb/UA1/nub_arbn
-add wave -noupdate /nubus_arbiter_tb/UA1/arb_ena
-add wave -noupdate /nubus_arbiter_tb/UA1/arb_grant_o
-add wave -noupdate /nubus_arbiter_tb/UA2/nub_idn
-add wave -noupdate /nubus_arbiter_tb/UA2/nub_arbn
-add wave -noupdate /nubus_arbiter_tb/UA2/arb_ena
-add wave -noupdate /nubus_arbiter_tb/UA2/arb_grant_o
+add wave -noupdate /nubus_arbiter_tb/UA1/idn
+add wave -noupdate /nubus_arbiter_tb/UA1/arbn
+add wave -noupdate /nubus_arbiter_tb/UA1/arbcyn
+add wave -noupdate /nubus_arbiter_tb/UA1/grant
+add wave -noupdate /nubus_arbiter_tb/UA2/idn
+add wave -noupdate /nubus_arbiter_tb/UA2/arbn
+add wave -noupdate /nubus_arbiter_tb/UA2/arbcyn
+add wave -noupdate /nubus_arbiter_tb/UA2/grant
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {0 ps} 0}
 quietly wave cursor active 0

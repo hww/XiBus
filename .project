@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>NuBus</name>
+	<name>NuBus_</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -15,11 +15,4 @@
 		<nature>com.sigasi.hdt.verilog.ui.verilogNature</nature>
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>Common Libraries</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

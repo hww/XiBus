@@ -1,5 +1,5 @@
 
-module cpu_encoder
+module cpu_bus
   (
    input         adrcy,
    input [3:0]   cpu_write,

@@ -8,7 +8,7 @@ module nubus_master_tb ();
    parameter TEST_ADDR = 'hF0000000;
    parameter TEST_DATA = 'h87654321;
    parameter [1:0]  MEMORY_WAIT_CLOCKS = 1;
-   
+   parameter CPU_LOCKED = 1;
    
    // Slot Identificatjon
    tri1 [3:0]          nub_idn; 
@@ -105,7 +105,7 @@ module nubus_master_tb ();
    reg [31:0]  tst_addr;
    reg [31:0]  tst_wdata;
    reg [31:0]  tst_rdata;
-   reg         tst_acknd; // half clk delayed ackn
+   reg         cpu_readyd; // half clk delayed ackn
    reg         tst_lock;
 
    assign nub_clkn     = tst_clkn;
@@ -116,7 +116,6 @@ module nubus_master_tb ();
    assign cpu_wdata = tst_wdata;
    assign cpu_addr = tst_addr;
    assign cpu_lock = tst_lock;
-   assign cpu_ready = ~nub_ackn;
 
    
    initial begin
@@ -131,8 +130,8 @@ module nubus_master_tb ();
       tst_rdata  <= 0;
       tst_valid <= 0;
       tst_wstrb <= 0;
-      tst_acknd <= 1;
-      tst_lock <= 0;
+      cpu_readyd <= 0;
+      tst_lock <= CPU_LOCKED;
       
       @ (posedge nub_clkn);
       @ (posedge nub_clkn);
@@ -186,12 +185,12 @@ module nubus_master_tb ();
          tst_wdata <= data;
          tst_wstrb <= wstrb;
          tst_valid <= 1;
-         tst_acknd <= 1;
+         cpu_readyd <= 0;
          do begin
             @ (negedge nub_clkn);
-            tst_acknd <= nub_ackn;
+            cpu_readyd <= cpu_ready;
             @ (posedge nub_clkn);
-         end while (tst_acknd);
+         end while (~cpu_readyd);
          tst_valid <= 0;
          tst_wstrb <= 0;
          $display ("%g  (write) address: $%h wstrb: $%b data: $%h", $time, addr, wstrb, data);
@@ -209,13 +208,13 @@ module nubus_master_tb ();
          tst_addr <= addr;
          tst_wstrb <= 0;
          tst_valid <= 1;
-         tst_acknd <= 1;
+         cpu_readyd <= 0;
          do begin
             @ (negedge nub_clkn);
             tst_rdata <= cpu_rdata;
-            tst_acknd <= nub_ackn;
+            cpu_readyd <= cpu_ready;
             @ (posedge nub_clkn);
-         end while (tst_acknd) ;
+         end while (~cpu_readyd) ;
          tst_valid <= 0;
          $display ("%g  (read ) address: $%h wstrb: $%b data: $%h", $time, addr, wstrb, tst_rdata);
       end

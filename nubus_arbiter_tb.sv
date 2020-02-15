@@ -8,26 +8,26 @@ module nubus_arbiter_tb ();
    // per instance pins   
    tri1 unsigned [3:0] id1;
    tri1                grant1;
-   tri1                enable1;
+   tri1                arbcyn1;
    tri1 unsigned [3:0] id2;
    tri1                grant2;
-   tri1                enable2;
+   tri1                arbcyn2;
    
    // instantiate arbiter 1
    nubus_arbiter UA1
      (
-      .nub_idn(id1), 
-      .nub_arbn(arbn), 
-      .arb_ena(enable1), 
-      .arb_grant_o(grant1)
+      .idn(id1), 
+      .arbn(arbn), 
+      .arbcyn(arbcyn1), 
+      .grant(grant1)
       );
    // instantiate arbiter 2
    nubus_arbiter UA2
      (
-      .nub_idn(id2), 
-      .nub_arbn(arbn), 
-      .arb_ena(enable2), 
-      .arb_grant_o(grant2)
+      .idn(id2), 
+      .arbn(arbn), 
+      .arbcyn(arbcyn2), 
+      .grant(grant2)
       );
 
    // declarate register with IDs for the boards
@@ -37,12 +37,12 @@ module nubus_arbiter_tb ();
    assign id2 = rid2;
 
    // actvate arbiters only when IDs are different
-   assign enable1 = rid1 != rid2;
-   assign enable2 = rid1 != rid2;
+   assign arbcyn1 = ~(rid1 != rid2);
+   assign arbcyn2 = ~(rid1 != rid2);
 
    // just test fault signal
    reg               fault;
-   
+
    initial begin
       $display ("Start testing Nubus Arbiter");
       $dumpfile("nubus_arbiter_tb.vcd");

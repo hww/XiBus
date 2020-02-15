@@ -1,5 +1,11 @@
 obj_dir
 work
+.settings
+.project
 *.vstf
 *.vvp
 *.vcd
+*.wlf
+*.out
+*.bak
+wlft*

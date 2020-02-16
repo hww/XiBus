@@ -34,24 +34,24 @@ module nubus_master
    input        arb_grant, // Grant access
    input        cpu_lock, // Locked by CPU
    input        cpu_valid, // Slv_master mode access
-   output       locked_o, // Locked or not tranfer
+   output       lockedn_o, // Locked or not tranfer
    output       arbdn_o,
-   output       busy_o,
-   output       owner_o, // Address or data transfer
-   output       dtacy_o, // Data strobe
-   output       adrcy_o, // Address strobe
-   output       arbcy_o // Arbiter enabled
+   output       busyn_o,
+   output       ownern_o, // Address or data transfer
+   output       dtacyn_o, // Data strobe
+   output       adrcyn_o, // Address strobe
+   output       arbcyn_o // Arbiter enabled
    );
 
    reg    locked, arbdn, busy, owner, dtacy, adrcy, arbcy;
 
-   assign locked_o = locked;
+   assign lockedn_o = ~locked;
    assign arbdn_o = arbdn;
-   assign busy_o = busy;
-   assign owner_o = owner;
-   assign dtacy_o = dtacy;
-   assign adrcy_o = adrcy;
-   assign arbcy_o = arbcy;
+   assign busyn_o = ~busy;
+   assign ownern_o = ~owner;
+   assign dtacyn_o = ~dtacy;
+   assign adrcyn_o = ~adrcy;
+   assign arbcyn_o = ~arbcy;
 
    wire   clkn = nub_clkn;
    wire   reset = ~nub_resetn;

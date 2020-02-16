@@ -1,7 +1,7 @@
 
 module cpu_bus
   (
-   input         adrcy,
+   input         adrcyn,
    input [3:0]   cpu_write,
    input [31:0]  cpu_addr,
    input [31:0]  cpu_wdata,
@@ -45,7 +45,7 @@ module cpu_bus
    wire [31:0] cpu_tma;
    assign cpu_tma[31:2] = cpu_addr[31:2];
    assign cpu_tma[ 1:0] = ~tmadn[1:0];
-   assign cpu_ad_o = adrcy ? cpu_tma : cpu_wdata;
+   assign cpu_ad_o = ~adrcyn ? cpu_tma : cpu_wdata;
 
    assign error_o = tmadn[4];
    assign tm1n_o = tmadn[3];

@@ -61,10 +61,10 @@ module nubus
 
    wire           slv_master, slv_slave;
    wire           slv_tm1n, slv_tm0n;
-   wire           mst_adrcy, mst_dtacy;
+   wire           mst_adrcyn, mst_dtacyn;
    wire           cpu_tm1n, cpu_tm0;
    wire slv_ackcyn, slv_myslot;
-  wire mst_locked, mst_arbdn,mst_busy;
+  wire mst_lockedn, mst_arbdn,mst_busyn;
   
    // ==========================================================================
    // Processor address bus buffers
@@ -72,18 +72,18 @@ module nubus
 
 
    
-   wire        mst_owner;
+   wire        mst_ownern;
    wire [31:0] cpu_ad;
-   wire        cpu_adsel = mst_adrcy | mst_dtacy & ~cpu_tm1n;
+   wire        cpu_adsel = ~mst_adrcyn | ~mst_dtacyn & ~cpu_tm1n;
    // Select nubus data signals
    wire [31:0] nub_ad   = cpu_adsel  ? cpu_ad : mem_rdata;
    
    // When 1 - drive the NuBus AD lines 
    assign nub_adoe =   slv_slave  & slv_tm1n
                        /*SLAVE read of card*/
-                       | cpu_valid & mst_adrcy
+                       | cpu_valid & ~mst_adrcyn
                        /*MASTER address cycle*/
-	                     | mst_owner & mst_dtacy & ~cpu_tm1n
+	                     | ~mst_ownern & ~mst_dtacyn & ~cpu_tm1n
                        /*MASTER data cycle, when writing*/
                        ;
    // Output to nubus the 
@@ -95,13 +95,13 @@ module nubus
    // Arbiter Interface
    // ==========================================================================
 
-   wire           mst_arbcy, arb_grant;
+   wire           mst_arbcyn, arb_grant;
 
    nubus_arbiter UArbiter
      (
       .idn(nub_idn),
       .arbn(nub_arbn),
-      .arbcyn(~mst_arbcy),
+      .arbcyn(mst_arbcyn),
       .grant(arb_grant)
       );
 
@@ -157,13 +157,13 @@ module nubus
       .cpu_lock(cpu_lock), // Address line
       .cpu_valid(cpu_valid), // Master mode (delayed)
 
-      .locked_o(mst_locked), // Locked or not tranfer
+      .lockedn_o(mst_lockedn), // Locked or not tranfer
       .arbdn_o(mst_arbdn),
-      .busy_o(mst_busy),
-      .owner_o(mst_owner), // Address or data transfer
-      .dtacy_o(mst_dtacy), // Data strobe
-      .adrcy_o(mst_adrcy), // Address strobe
-      .arbcy_o(mst_arbcy) // Arbiter enabled
+      .busyn_o(mst_busyn),
+      .ownern_o(mst_ownern), // Address or data transfer
+      .dtacyn_o(mst_dtacyn), // Data strobe
+      .adrcyn_o(mst_adrcyn), // Address strobe
+      .arbcyn_o(mst_arbcyn) // Arbiter enabled
    );
 
    // ==========================================================================
@@ -175,11 +175,11 @@ module nubus
    nubus_driver UNDriver
      (
       .slv_ackcyn(slv_ackcyn), // Achnowlege
-      .mst_arbcyn(~mst_arbcy), // Arbiter enabled
-      .mst_adrcyn(~mst_adrcy), // Address strobe
-      .mst_dtacyn(~mst_dtacy), // Data strobe
-      .mst_ownern(~mst_owner), // Master is owner of the bus
-      .mst_lockedn(~mst_locked), // Locked or not transfer
+      .mst_arbcyn(mst_arbcyn), // Arbiter enabled
+      .mst_adrcyn(mst_adrcyn), // Address strobe
+      .mst_dtacyn(mst_dtacyn), // Data strobe
+      .mst_ownern(mst_ownern), // Master is owner of the bus
+      .mst_lockedn(mst_lockedn), // Locked or not transfer
       .mst_tm1n(cpu_tm1n), // Address ines
       .mst_tm0n(cpu_tm0n), // Address ines
 
@@ -202,7 +202,7 @@ module nubus
    
    cpu_bus UCPUBus
      (
-      .adrcy(mst_adrcy),
+      .adrcyn(mst_adrcyn),
       .cpu_write(cpu_write),
       .cpu_addr(cpu_addr),
       .cpu_wdata(cpu_wdata),

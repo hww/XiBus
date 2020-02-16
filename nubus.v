@@ -59,25 +59,25 @@ module nubus
    wire           nub_clk = ~nub_clkn;
    wire           nub_reset = ~nub_resetn;
 
-   wire           slv_master, slv_slave;
-   wire           slv_tm1n, slv_tm0n;
-   wire           mst_adrcyn, mst_dtacyn;
-   wire           cpu_tm1n, cpu_tm0;
-   wire slv_ackcyn, slv_myslot;
-  wire mst_lockedn, mst_arbdn,mst_busyn;
-  
    // ==========================================================================
-   // Processor address bus buffers
+   // Global signals 
    // ==========================================================================
 
+   wire           arb_grant;
+   wire           slv_master, slv_slave, slv_tm1n, slv_tm0n, slv_ackcyn, slv_myslot;
+   wire           mst_adrcyn, mst_dtacyn, mst_lockedn, mst_arbdn, 
+                  mst_busyn, mst_ownern, mst_arbcyn;
+   wire [31:0]    cpu_ad;
+   wire           cpu_tm0n, nub_qstoen, drv_tmoen, cpu_tm1n, cpu_tm0;
 
-   
-   wire        mst_ownern;
-   wire [31:0] cpu_ad;
+   // ==========================================================================
+   // Drive NuBus address-data line 
+   // ==========================================================================
+
    wire        cpu_adsel = ~mst_adrcyn | ~mst_dtacyn & ~cpu_tm1n;
    // Select nubus data signals
    wire [31:0] nub_ad   = cpu_adsel  ? cpu_ad : mem_rdata;
-   
+
    // When 1 - drive the NuBus AD lines 
    assign nub_adoe =   slv_slave  & slv_tm1n
                        /*SLAVE read of card*/
@@ -89,13 +89,9 @@ module nubus
    // Output to nubus the 
    assign nub_adn = nub_adoe ? ~nub_ad : 'bZ;
 
-
-
    // ==========================================================================
    // Arbiter Interface
    // ==========================================================================
-
-   wire           mst_arbcyn, arb_grant;
 
    nubus_arbiter UArbiter
      (
@@ -126,14 +122,13 @@ module nubus
       .nub_adn(nub_adn),
       .nub_idn(nub_idn),
       .mem_ready(mem_ready),
+      .drv_mstdn(drv_mstdn),
 
-      .mstdn(drv_mstdn),
-
-      .slave_o(slv_slave), // Slave mode
-      .tm1n_o(slv_tm1n), // Latched transition mode 1 (Read/Write)
-      .tm0n_o(slv_tm0n),
-      .ackcyn_o(slv_ackcyn), // Acknowlege
-      .myslot_o(slv_myslot), 
+      .slv_slave_o(slv_slave), // Slave mode
+      .slv_tm1n_o(slv_tm1n), // Latched transition mode 1 (Read/Write)
+      .slv_tm0n_o(slv_tm0n),
+      .slv_ackcyn_o(slv_ackcyn), // Acknowlege
+      .slv_myslot_o(slv_myslot), 
       .mem_valid_o(mem_valid),
       .mem_addr_o(mem_addr),
       .mem_write_o(mem_write),
@@ -157,21 +152,19 @@ module nubus
       .cpu_lock(cpu_lock), // Address line
       .cpu_valid(cpu_valid), // Master mode (delayed)
 
-      .lockedn_o(mst_lockedn), // Locked or not tranfer
-      .arbdn_o(mst_arbdn),
-      .busyn_o(mst_busyn),
-      .ownern_o(mst_ownern), // Address or data transfer
-      .dtacyn_o(mst_dtacyn), // Data strobe
-      .adrcyn_o(mst_adrcyn), // Address strobe
-      .arbcyn_o(mst_arbcyn) // Arbiter enabled
+      .mst_lockedn_o(mst_lockedn), // Locked or not tranfer
+      .mst_arbdn_o(mst_arbdn),
+      .mst_busyn_o(mst_busyn),
+      .mst_ownern_o(mst_ownern), // Address or data transfer
+      .mst_dtacyn_o(mst_dtacyn), // Data strobe
+      .mst_adrcyn_o(mst_adrcyn), // Address strobe
+      .mst_arbcyn_o(mst_arbcyn) // Arbiter enabled
    );
 
    // ==========================================================================
    // Driver Nubus
    // ==========================================================================
 
-   wire cpu_tm0n, nub_qstoen, drv_tmoen;
-  
    nubus_driver UNDriver
      (
       .slv_ackcyn(slv_ackcyn), // Achnowlege
@@ -199,19 +192,19 @@ module nubus
 
    assign cpu_rdata = ~nub_adn;
    assign cpu_ready = ~nub_ackn & nub_startn;
-   
+
    cpu_bus UCPUBus
      (
-      .adrcyn(mst_adrcyn),
+      .mst_adrcyn(mst_adrcyn),
       .cpu_write(cpu_write),
       .cpu_addr(cpu_addr),
       .cpu_wdata(cpu_wdata),
 
       .cpu_ad_o(cpu_ad),
-      .tm1n_o(cpu_tm1n),
-      .tm0n_o(cpu_tm0n),
-      .error_o(cpu_error)
+      .cpu_tm1n_o(cpu_tm1n),
+      .cpu_tm0n_o(cpu_tm0n),
+      .cpu_error_o(cpu_error)
    );
-   
+
 endmodule
 

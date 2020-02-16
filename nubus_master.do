@@ -74,17 +74,17 @@ add wave -divider "Debugging"
 
 
 
-add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/arbdn_o
+add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/mst_arbdn_o
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/arb_grant
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/cpu_valid
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/cpu_lock
-add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/locked_o
+add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/mst_lockedn_o
 
-add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/arbcy_o
-add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/adrcy_o
-add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/dtacy_o
-add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/owner_o
-add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/busy_o
+add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/mst_arbcyn_o
+add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/mst_adrcyn_o
+add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/mst_dtacyn_o
+add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/mst_ownern_o
+add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/mst_busyn_o
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/nub_rqstn
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/nub_startn
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/nub_ackn
@@ -97,23 +97,23 @@ add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/nub_tm0n
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/nub_tm1n
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/mem_ready
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/mem_myslot
-add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/mstdn
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/drv_mstdn
 
-add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slave_o
-add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/myslot_o
-add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/tm0n_o
-add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/tm1n_o
-add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/ackcy_o
-
-
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_slave_o
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_myslot_o
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_tm0n_o
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_tm1n_o
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_ackcyn_o
 
 
-add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/slv_ackcy
-add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_arbcy
-add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_adrcy
-add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_dtacy
-add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_owner
-add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_locked
+
+
+add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/slv_ackcyn
+add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_arbcyn
+add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_adrcyn
+add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_dtacyn
+add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_ownern
+add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_lockedn
 add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_tm1n
 add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/mst_tm0n
 
@@ -122,8 +122,8 @@ add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/nub_tm1n_o
 add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/nub_ackn_o
 add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/nub_startn_o
 add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/nub_rqstn_o
-add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/nub_rqstoe_o
-add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/drv_tmoe_o
+add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/nub_rqstoen_o
+add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/drv_tmoen_o
 add wave -bin -group Driver sim:/nubus_master_tb/UNuBus/UNDriver/drv_mstdn_o
    
 #add wave -recursive -depth 10 *

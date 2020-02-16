@@ -8,6 +8,8 @@ module nubus_slave_tb ();
    parameter TEST_ADDR = 'hF0000000;
    parameter TEST_DATA = 'h87654321;
    parameter [1:0]  MEMORY_WAIT_CLOCKS = 1;   
+   parameter DEBUG_NUBUS_START = 0;
+   parameter DEBUG_MEMORY_CYCLE = 0;
    
    // Slot Identificatjon
    tri1 [3:0]          nub_idn; 
@@ -100,42 +102,46 @@ module nubus_slave_tb ();
    // Disabale CPU bus
    assign cpu_valid = 0;
 
+   // State machine of test bench
    reg         tst_clkn;
    reg         tst_resetn;
-   reg         tst_start;
-   reg [1:0]   tst_tm;
-   reg [1:0]   tst_status;
-   reg [31:0]  tst_addr;
-   reg [31:0]  tst_wdata;
-   reg [31:0]  tst_rdata;
-   reg         tst_acknd; // half clk delayed ackn
-   wire [1:0]  tst_tmn = ~tst_tm;
+   reg         tst_startn;
+   reg         tst_ackn;    // half clkn delayed ackn
+   reg [1:0]   tst_tmn;
+   reg [1:0]   tst_statusn;
+   reg [31:0]  tst_addrn;
+   reg [31:0]  tst_wdatan;
+   reg [31:0]  tst_rdatan;
 
-
+   // Drive NuBus signals
    assign nub_clkn     = tst_clkn;
    assign nub_resetn   = tst_resetn;
-   assign nub_startn   = ~tst_start;
+   assign nub_startn   = tst_startn;   
+   assign nub_tm0n     = tst_startn ? 'bZ : tst_tmn[0];
+   assign nub_tm1n     = tst_startn ? 'bZ : tst_tmn[1];
    
-   assign nub_tm0n     = tst_start ? tst_tmn[0] : 'bZ;
-   assign nub_tm1n     = tst_start ? tst_tmn[1] : 'bZ;
+   // Drive NuBus address/data lines
+   wire [31:0] tst_adn = tst_startn ? tst_wdatan : tst_addrn;
+   wire tst_nuboen     = tst_startn & tst_tmn[1];
+   assign nub_adn      = tst_nuboen ? 'bZ : tst_adn;
    
-   wire [31:0] tst_ad = tst_start ? tst_addr : tst_wdata;
-   wire tst_nuboe = tst_start | tst_tm[1];
-   assign nub_adn     = tst_nuboe ? ~tst_ad : 'bZ;
-   
+   // Inverted verions of registers 
+   wire [31:0] tst_rdata = ~tst_rdatan;
+   wire [31:0] tst_addr  = ~tst_addrn;
+    
    initial begin
       $display ("Start VirtualMaster write to NubusSlave");
       $dumpfile("nubus_slave_tb.vcd");
       $dumpvars;
 
-      tst_clkn <= 1;
+      tst_clkn   <= 1;
       tst_resetn <= 0;
-      tst_addr <= 0;
-      tst_wdata <= 0;
-      tst_rdata  <= 0;
-      tst_start <= 0;
-      tst_status <= TMN_NOP;
-      tst_tm <= TMN_NOP;
+      tst_addrn  <= 'hFFFFFFFF;
+      tst_wdatan <= 'hFFFFFFFF;
+      tst_rdatan <= 'hFFFFFFFF;
+      tst_startn <= 1;
+      tst_statusn<= TMN_TRY_AGAIN_LATER;
+      tst_tmn    <= TMN_NOP;
 
       @ (posedge nub_clkn);
       @ (posedge nub_clkn);
@@ -181,26 +187,26 @@ module nubus_slave_tb ();
    // ======================================================
 
    task write_word;
-      input [3:0]  tmad;
+      input [3:0]  tmadn;
       input [31:0] addr;
       input [31:0] data;
       begin
-         tst_wdata <= data;
-         tst_addr[31:2] <= addr[31:2];
-         tst_addr[ 1:0] <= tmad[1:0]; 
-         tst_tm <= tmad[3:2];
-         tst_start <= 1;
-         tst_status <= TMN_NOP;
+         tst_wdatan     <= ~data;
+         tst_addrn[31:2] <= ~addr[31:2];
+         tst_addrn[ 1:0] <= tmadn[1:0]; 
+         tst_tmn        <= tmadn[3:2];
+         tst_startn     <= 0;
+         //tst_statusn    <= TMN_TRY_AGAIN_LATER;
          @ (posedge nub_clkn);
-         tst_start <= 0;
-         tst_acknd <= nub_ackn;
+         tst_startn     <= 1;
+         tst_ackn       <= nub_ackn;
          do begin
             @ (negedge nub_clkn);
-            tst_acknd <= nub_ackn;
-            tst_status <= ~{ nub_tm1n, nub_tm0n };
+            tst_ackn    <= nub_ackn;
+            tst_statusn <= { nub_tm1n, nub_tm0n };
             @ (posedge nub_clkn);
-         end while (tst_acknd) ;
-         $display ("%g  (write) address: $%h tm: $%h data: $%h stat: %s", $time, addr, tmad, data, get_status_str(tst_status));
+         end while (tst_ackn) ;
+         $display ("%g  (write) address: $%h tm: $%h data: $%h stat: %s", $time, addr, tmadn, data, get_status_str(tst_statusn));
       end
    endtask
 
@@ -209,25 +215,25 @@ module nubus_slave_tb ();
    // ======================================================
 
    task read_word;
-      input [3:0]  tmad;
+      input [3:0]  tmadn;
       input [31:0] addr;
       begin
-         tst_addr[31:2] <= addr[31:2];
-         tst_addr[ 1:0] <= tmad[1:0];
-         tst_tm <= tmad[3:2];
-         tst_start <= 1;
-         tst_status <= TMN_NOP;
+         tst_tmn         <= tmadn[3:2];
+         tst_addrn[ 1:0] <= tmadn[1:0];
+         tst_addrn[31:2] <= ~addr[31:2];
+         tst_startn  <= 0;
+         //tst_statusn <= TMN_TRY_AGAIN_LATER;
          @ (posedge nub_clkn);
-         tst_start <= 0;
-         tst_acknd <= nub_ackn;
+         tst_startn  <= 1;
+         tst_ackn    <= nub_ackn;
          do begin
             @ (negedge nub_clkn);
-            tst_rdata <= ~nub_adn;
-            tst_acknd <= nub_ackn;
-            tst_status <= ~{ nub_tm1n, nub_tm0n };
+            tst_rdatan  <= nub_adn;
+            tst_ackn    <= nub_ackn;
+            tst_statusn <= { nub_tm1n, nub_tm0n };
             @ (posedge nub_clkn);
-         end while (tst_acknd) ;
-         $display ("%g  (read ) address: $%h tm: $%h data: $%h stat: %s", $time, addr, tmad, tst_rdata, get_status_str(tst_status));
+         end while (tst_ackn) ;
+         $display ("%g  (read ) address: $%h tm: $%h data: $%h stat: %s", $time, addr, tmadn, tst_rdata, get_status_str(tst_statusn));
       end
    endtask
 
@@ -260,6 +266,10 @@ module nubus_slave_tb ();
       tst_clkn <= 1;
       #75;
       tst_clkn <= 0;
+      if (DEBUG_NUBUS_START) begin
+         if (~nub_startn) 
+            $display ("%g  (NuBus Start) /ad: $%h {/tmadn}: %b%b%b%b", $time, nub_adn, nub_tm1n, nub_tm0n, nub_adn[1], nub_adn[0]);
+      end
       #25;
    end
 
@@ -269,8 +279,11 @@ module nubus_slave_tb ();
 
    wire mem_any_write; // unused, just for debugging 
    
-   nubus_memory NMem 
-     (
+   nubus_memory     
+    #(
+       .DEBUG_MEMORY_CYCLE(DEBUG_MEMORY_CYCLE)
+     ) 
+     NMem (
       .mem_clk(~nub_clkn),
       .mem_reset(~nub_resetn),
       .mem_valid(mem_valid),

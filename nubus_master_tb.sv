@@ -9,6 +9,8 @@ module nubus_master_tb ();
    parameter TEST_DATA = 'h87654321;
    parameter [1:0]  MEMORY_WAIT_CLOCKS = 1;
    parameter CPU_LOCKED = 1;
+   parameter DEBUG_NUBUS_START = 0;
+   parameter DEBUG_MEMORY_CYCLE = 0;
    
    // Slot Identificatjon
    tri1 [3:0]          nub_idn; 
@@ -108,14 +110,14 @@ module nubus_master_tb ();
    reg         cpu_readyd; // half clk delayed ackn
    reg         tst_lock;
 
-   assign nub_clkn     = tst_clkn;
-   assign nub_resetn   = tst_resetn;
+   assign nub_clkn   = tst_clkn;
+   assign nub_resetn = tst_resetn;
 
    assign cpu_valid = tst_valid;
    assign cpu_write = tst_wstrb;
    assign cpu_wdata = tst_wdata;
-   assign cpu_addr = tst_addr;
-   assign cpu_lock = tst_lock;
+   assign cpu_addr  = tst_addr;
+   assign cpu_lock  = tst_lock;
 
    
    initial begin
@@ -123,15 +125,15 @@ module nubus_master_tb ();
       $dumpfile("nubus_master_tb.vcd");
       $dumpvars;
 
-      tst_clkn <= 1;
+      tst_clkn   <= 1;
       tst_resetn <= 0;
-      tst_addr <= 0;
-      tst_wdata <= 0;
+      tst_addr   <= 0;
+      tst_wdata  <= 0;
       tst_rdata  <= 0;
-      tst_valid <= 0;
-      tst_wstrb <= 0;
+      tst_valid  <= 0;
+      tst_wstrb  <= 0;
       cpu_readyd <= 0;
-      tst_lock <= CPU_LOCKED;
+      tst_lock   <= CPU_LOCKED;
       
       @ (posedge nub_clkn);
       @ (posedge nub_clkn);
@@ -231,14 +233,11 @@ module nubus_master_tb ();
       input [31:0] wdata
       );
       reg [31:0]   expected;
-      begin
-         $display("$%h", write);
-         
+      begin    
          expected[ 7: 0] = write[0] ? wdata[ 7: 0] : 0;
          expected[15: 8] = write[1] ? wdata[15: 8] : 0;
          expected[23:16] = write[2] ? wdata[23:16] : 0;
          expected[31:24] = write[3] ? wdata[31:24] : 0;
-         $display("$%h",expected);
          if (tst_rdata == expected)
            $display (":) PASSED");
          else
@@ -255,8 +254,10 @@ module nubus_master_tb ();
       tst_clkn <= 1;
       #75;
       tst_clkn <= 0;
-      if (~nub_startn)
-        $display ("%g  (NUB) /ad: $%h {/tm1,/tm0,/adn1,/adn0}: %b%b%b%b", $time, nub_adn, nub_tm1n, nub_tm0n, nub_adn[1], nub_adn[0]);
+      if (DEBUG_NUBUS_START) begin
+          if (~nub_startn) 
+            $display ("%g  (NuBus Start) /ad: $%h {/tmadn}: %b%b%b%b", $time, nub_adn, nub_tm1n, nub_tm0n, nub_adn[1], nub_adn[0]);
+      end
       #25;
    end
 
@@ -266,8 +267,11 @@ module nubus_master_tb ();
 
    wire mem_any_write; // unused, just for debugging 
    
-   nubus_memory NMem 
-     (
+   nubus_memory 
+    #(
+       .DEBUG_MEMORY_CYCLE(DEBUG_MEMORY_CYCLE)
+     ) 
+     NMem (
       .mem_clk(~nub_clkn),
       .mem_reset(~nub_resetn),
       .mem_valid(mem_valid),

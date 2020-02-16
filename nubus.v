@@ -63,20 +63,14 @@ module nubus
    wire           slv_tm1n, slv_tm0n;
    wire           mst_adrcy, mst_dtacy;
    wire           cpu_tm1n, cpu_tm0;
-
+   wire slv_ackcyn, slv_myslot;
+  wire mst_locked, mst_arbdn,mst_busy;
+  
    // ==========================================================================
    // Processor address bus buffers
    // ==========================================================================
 
-   reg [31:0]     slv_addr;
-   
-   always @(negedge nub_clkn or posedge nub_reset) begin : proc_ad_slave
-      if (nub_reset) begin
-         slv_addr <= 0;
-      end else if (~nub_startn) begin
-         slv_addr <= ~nub_adn;
-      end
-   end
+
    
    wire        mst_owner;
    wire [31:0] cpu_ad;
@@ -89,20 +83,13 @@ module nubus
                        /*SLAVE read of card*/
                        | cpu_valid & mst_adrcy
                        /*MASTER address cycle*/
-	               | mst_owner & mst_dtacy & ~cpu_tm1n
+	                     | mst_owner & mst_dtacy & ~cpu_tm1n
                        /*MASTER data cycle, when writing*/
                        ;
    // Output to nubus the 
    assign nub_adn = nub_adoe ? ~nub_ad : 'bZ;
 
-   // ==========================================================================
-   // Slot selection and expansion selection
-   // ==========================================================================
 
-   // Card ID
-   wire [3:0] nub_id = ~nub_idn;
-   assign mem_myslot = nub_id == slv_addr[27:24] & slv_addr[31:28] == SLOTS_ADDRESS;
-   assign mem_myexp = (slv_addr[31:28] & EXPANSION_MASK) == EXPANSION_ADDR;
 
    // ==========================================================================
    // Arbiter Interface
@@ -122,7 +109,13 @@ module nubus
    // Slave FSM
    // ==========================================================================
 
-   nubus_slave USlave
+   nubus_slave 
+   #(
+      .SLOTS_ADDRESS (SLOTS_ADDRESS), 
+      .EXPANSION_MASK(EXPANSION_MASK), 
+      .EXPANSION_ADDR(EXPANSION_ADDR)
+   )
+   USlave
      (
       .nub_clkn(nub_clkn), // Clock
       .nub_resetn(nub_resetn), // Reset
@@ -130,16 +123,23 @@ module nubus
       .nub_ackn(nub_ackn), // Transfer end
       .nub_tm1n(nub_tm1n), // Transition mode 1 (Read/Write)
       .nub_tm0n(nub_tm0n),
+      .nub_adn(nub_adn),
+      .nub_idn(nub_idn),
       .mem_ready(mem_ready),
-      .mem_myslot(mem_myslot), // Slot selected
+
       .mstdn(drv_mstdn),
 
       .slave_o(slv_slave), // Slave mode
       .tm1n_o(slv_tm1n), // Latched transition mode 1 (Read/Write)
       .tm0n_o(slv_tm0n),
-      .ackcy_o(slv_ackcy), // Acknowlege
+      .ackcyn_o(slv_ackcyn), // Acknowlege
       .myslot_o(slv_myslot), 
-      .mem_valid_o(mem_valid)
+      .mem_valid_o(mem_valid),
+      .mem_addr_o(mem_addr),
+      .mem_write_o(mem_write),
+      .mem_wdata_o(mem_wdata), 
+      .mem_myslot(mem_myslot), // Slot selected
+      .mem_myexp(mem_myexp) // Slot selected
       );
 
    // ==========================================================================
@@ -170,14 +170,16 @@ module nubus
    // Driver Nubus
    // ==========================================================================
 
+   wire cpu_tm0n, nub_qstoen, drv_tmoen;
+  
    nubus_driver UNDriver
      (
-      .slv_ackcy(slv_ackcy), // Achnowlege
-      .mst_arbcy(mst_arbcy), // Arbiter enabled
-      .mst_adrcy(mst_adrcy), // Address strobe
-      .mst_dtacy(mst_dtacy), // Data strobe
-      .mst_owner(mst_owner), // Master is owner of the bus
-      .mst_locked(mst_locked), // Locked or not transfer
+      .slv_ackcyn(slv_ackcyn), // Achnowlege
+      .mst_arbcyn(~mst_arbcy), // Arbiter enabled
+      .mst_adrcyn(~mst_adrcy), // Address strobe
+      .mst_dtacyn(~mst_dtacy), // Data strobe
+      .mst_ownern(~mst_owner), // Master is owner of the bus
+      .mst_lockedn(~mst_locked), // Locked or not transfer
       .mst_tm1n(cpu_tm1n), // Address ines
       .mst_tm0n(cpu_tm0n), // Address ines
 
@@ -186,52 +188,10 @@ module nubus
       .nub_ackn_o(nub_ackn), // Achnowlege
       .nub_startn_o(nub_startn), // Transfer start
       .nub_rqstn_o(nub_rqstn), // Bus request
-      .nub_rqstoe_o(nub_qstoe), // Bus request enable
-      .drv_tmoe_o(drv_tmoen), // Transfer mode enable
+      .nub_rqstoen_o(nub_qstoen), // Bus request enable
+      .drv_tmoen_o(drv_tmoen), // Transfer mode enable
       .drv_mstdn_o(drv_mstdn) // Guess: Slave sends /ACK. Master responds with /MSTDN, which allows slave to clear /ACK and listen for next transaction.
       );
-
-   // ==========================================================================
-   // Memory Interface
-   // ==========================================================================
-
-   wire write;
-   wire a1ln, a0ln;
-   assign { a1ln, a0ln } = ~slv_addr[1:0];
-
-   assign mem_addr = slv_addr;
-   assign mem_wdata = ~nub_adn;
-
-   assign write = mem_valid & ~slv_tm1n;
-
-   assign mem_write[3]   =     write & ~a1ln & ~a0ln & ~slv_tm0n
-                             /* Byte 3 */
-                             | write & ~a1ln & ~a0ln &  slv_tm0n
-                             /* Half 1 */
-                             | write &  a1ln &  a0ln &  slv_tm0n
-                             /* Word */
-                             ;
-   assign mem_write[2]   =     write & ~a1ln &  a0ln & ~slv_tm0n
-                             /* Byte 2 */
-                             | write & ~a1ln & ~a0ln &  slv_tm0n
-                             /* Half 1 */
-                             | write &  a1ln &  a0ln &  slv_tm0n
-                             /* Word */
-                             ;
-   assign mem_write[1]   =     write &  a1ln & ~a0ln & ~slv_tm0n
-                             /* Byte 1 */
-                             | write &  a1ln & ~a0ln &  slv_tm0n
-                             /* Half 0 */
-                             | write &  a1ln &  a0ln &  slv_tm0n
-                             /* Word */
-                             ;
-   assign mem_write[0]   =     write &  a1ln &  a0ln & ~slv_tm0n
-                             /* Byte 0 */
-                             | write &  a1ln & ~a0ln &  slv_tm0n
-                             /* Half 0 */
-                             | write &  a1ln &  a0ln &  slv_tm0n
-                             /* Word */
-                             ;
 
    // ==========================================================================
    // CPU Interface

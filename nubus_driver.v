@@ -22,12 +22,12 @@
 
 module nubus_driver
   (
-   input  slv_ackcy, // Achnowlege
-   input  mst_arbcy, // Arbiter enabled
-   input  mst_adrcy, // Address strobe
-   input  mst_dtacy, // Data strobe
-   input  mst_owner, // Master is owner of the bus
-   input  mst_locked, // Locked or not transfer
+   input  slv_ackcyn, // Achnowlege
+   input  mst_arbcyn, // Arbiter enabled
+   input  mst_adrcyn, // Address strobe
+   input  mst_dtacyn, // Data strobe
+   input  mst_ownern, // Master is owner of the bus
+   input  mst_lockedn, // Locked or not transfer
    input  mst_tm1n, // Address ines
    input  mst_tm0n, // Address ines
 
@@ -36,23 +36,24 @@ module nubus_driver
    output nub_ackn_o, // Achnowlege
    output nub_startn_o, // Transfer start
    output nub_rqstn_o, // Bus request
-   output nub_rqstoe_o, // Bus request enable
-   output drv_tmoe_o, // Transfer mode enable
+   output nub_rqstoen_o, // Bus request enable
+   output drv_tmoen_o, // Transfer mode enable
    output drv_mstdn_o // Guess: Slave sends /ACK. Master responds with /MSTDN, which allows slave to clear /ACK and listen for next transaction.
    );
    
    wire   tm0, tm1, tmoe, ack, rqstoe, mstdn;
 
    // ----------------------------------------------------
-   // Rename inputs
+   // Rename or invert inputs
    // ----------------------------------------------------
 
-   wire   locked = mst_locked;
-   wire   ackcy = slv_ackcy;
-   wire   arbcy = mst_arbcy;
-   wire   adrcy = mst_adrcy;
-   wire   dtacy = mst_dtacy;
-   wire   owner = mst_owner;
+   wire   ackcy = ~slv_ackcyn;
+   wire   arbcy = ~mst_arbcyn;
+   wire   adrcy = ~mst_adrcyn;
+   wire   dtacy = ~mst_dtacyn;
+   wire   owner = ~mst_ownern;
+   wire   locked = ~mst_lockedn;
+   
    wire   tm1n = mst_tm1n;
    wire   tm0n = mst_tm0n;
    
@@ -60,7 +61,7 @@ module nubus_driver
    // Drive outputs
    // ----------------------------------------------------
 
-   assign drv_tmoe_o   = tmoe;
+   assign drv_tmoen_o  = ~tmoe;
    assign nub_tm0n_o   = tmoe  ? ~tm0 : 'bZ;
    assign nub_tm1n_o   = tmoe  ? ~tm1 : 'bZ;
    assign nub_ackn_o   = tmoe  ? ~ack : 'bZ;
@@ -68,7 +69,7 @@ module nubus_driver
    assign nub_rqstn_o  = rqstoe  ?  0 : 'bZ;
 
    assign drv_mstdn_o  = mstdn;
-   assign rqstoe_o = rqstoe;
+   assign rqstoen_o    = ~rqstoe;
    
    // ----------------------------------------------------
    // Main logic

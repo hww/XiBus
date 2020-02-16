@@ -28,7 +28,6 @@ add wave -hex sim:/nubus_master_tb/UNuBus/nub_idn
 add wave -divider "Nubus Data"
 
 add wave -hex sim:/nubus_master_tb/UNuBus/nub_adn
-add wave -hex sim:/nubus_master_tb/UNuBus/slv_addr
 add wave -bin sim:/nubus_master_tb/UNuBus/nub_rqstn
 add wave -bin sim:/nubus_master_tb/UNuBus/nub_startn
 add wave -bin sim:/nubus_master_tb/UNuBus/nub_ackn

@@ -8,6 +8,11 @@
  * test card. It also supports the ROM, with the ROMOE signal .
  */
 module nubus_slave 
+    #(
+    parameter SLOTS_ADDRESS  = 'hF, // All slots starts with address 0xFXXXXXXX
+    parameter EXPANSION_MASK = 'hC, 
+    parameter EXPANSION_ADDR = 'h0
+    )
   (
    input  nub_clkn, // Clock
    input  nub_resetn, // Reset	
@@ -16,15 +21,22 @@ module nubus_slave
    input  nub_tm1n, // Transition mode 1 (Read/Write)
    input  nub_tm0n, //
    input  mem_ready,
-   input  mem_myslot, // Slot selected
+
    input  mstdn,
+   input [31:0] nub_adn,
+   input [3:0] nub_idn,
      
    output slave_o, // Slave mode
    output myslot_o,
    output tm1n_o,
    output tm0n_o,
-   output ackcy_o, // Acknowlege
-   output mem_valid_o
+   output ackcyn_o, // Acknowlege
+   output mem_valid_o,
+   output [3:0] mem_write_o,
+   output [31:0] mem_addr_o,
+   output [31:0] mem_wdata_o,
+   output  mem_myslot, // Slot selected
+   output  mem_myexp
    );
 
    reg        slaven, mastern, myslotl, tm1nl, tm0nl, mem_valid;
@@ -44,7 +56,7 @@ module nubus_slave
 
    wire       slave = ~slaven;
    wire       ackcy = mem_ready & mem_myslot & ~start;
-   assign ackcy_o = ackcy;
+   assign ackcyn_o = ~ackcy;
    
    
    always @(posedge clk or posedge reset) begin : proc_slave
@@ -93,6 +105,61 @@ module nubus_slave
                        /*latching terms for memory access*/
                       | mem_valid * ~ackcy;
       end
-   end
+  end
+  
+  // Slave address recorded at the NuBus start cycle.
+  reg [31:0]     mem_addr;
+  assign mem_addr_o = mem_addr;
+  
+  always @(negedge nub_clkn or posedge reset) begin : proc_ad_slave
+    if (reset) begin
+      mem_addr <= 0;
+    end else if (~nub_startn) begin
+      mem_addr <= ~nub_adn;
+    end
+  end
 
+   wire a1ln = ~mem_addr[1];
+   wire a0ln = ~mem_addr[0];
+   assign mem_wdata_o = ~nub_adn;
+
+   wire write = mem_valid & ~tm1n_o;
+
+   assign mem_write_o[3]   =   write & ~a1ln & ~a0ln & ~tm0n_o
+                             /* Byte 3 */
+                             | write & ~a1ln & ~a0ln &  tm0n_o
+                             /* Half 1 */
+                             | write &  a1ln &  a0ln &  tm0n_o
+                             /* Word */
+                             ;
+   assign mem_write_o[2]   =     write & ~a1ln &  a0ln & ~tm0n_o
+                             /* Byte 2 */
+                             | write & ~a1ln & ~a0ln &  tm0n_o
+                             /* Half 1 */
+                             | write &  a1ln &  a0ln &  tm0n_o
+                             /* Word */
+                             ;
+   assign mem_write_o[1]   =     write &  a1ln & ~a0ln & ~tm0n_o
+                             /* Byte 1 */
+                             | write &  a1ln & ~a0ln &  tm0n_o
+                             /* Half 0 */
+                             | write &  a1ln &  a0ln &  tm0n_o
+                             /* Word */
+                             ;
+   assign mem_write_o[0]   =     write &  a1ln &  a0ln & ~tm0n_o
+                             /* Byte 0 */
+                             | write &  a1ln & ~a0ln &  tm0n_o
+                             /* Half 0 */
+                             | write &  a1ln &  a0ln &  tm0n_o
+                             /* Word */
+                             ;
+                             
+   // ==========================================================================
+   // Slot selection and expansion selection
+   // ==========================================================================
+
+   // Card ID
+   wire [3:0] nub_id = ~nub_idn;
+   assign mem_myslot = nub_id == mem_addr[27:24] & mem_addr[31:28] == SLOTS_ADDRESS;
+   assign mem_myexp = (mem_addr[31:28] & EXPANSION_MASK) == EXPANSION_ADDR;
 endmodule

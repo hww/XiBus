@@ -121,7 +121,7 @@ module nubus_master_tb ();
 
    
    initial begin
-      $display ("Start CPU->NuBusMaster->NuBusSlave");
+      $display ("Start CPU writes and reads with NuBus master interfasce to/from NuBus slave memory module");
       $dumpfile("nubus_master_tb.vcd");
       $dumpvars;
 

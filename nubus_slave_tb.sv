@@ -130,7 +130,7 @@ module nubus_slave_tb ();
    wire [31:0] tst_addr  = ~tst_addrn;
     
    initial begin
-      $display ("Start VirtualMaster write to NubusSlave");
+      $display ("Start virtual master (vm) writes and reads to/from NuBus slave memory module");
       $dumpfile("nubus_slave_tb.vcd");
       $dumpvars;
 

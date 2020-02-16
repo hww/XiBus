@@ -1,15 +1,19 @@
 
 module cpu_bus
+  #(
+    parameter NUBUS_CONTROLLER_ADDR_START = 'h6
+  )
   (
    input         mst_adrcyn,
    input [3:0]   cpu_write,
    input [31:0]  cpu_addr,
    input [31:0]  cpu_wdata,
-
+   input         cpu_valid,
    output [31:0] cpu_ad_o,
    output        cpu_tm1n_o,
    output        cpu_tm0n_o,
-   output        cpu_error_o
+   output        cpu_error_o,
+   output        cpu_masterd_o
    );
 
    // ==========================================================================
@@ -49,6 +53,8 @@ module cpu_bus
    assign cpu_error_o = tmadn[4];
    assign cpu_tm1n_o = tmadn[3];
    assign cpu_tm0n_o = tmadn[2];
+   
+   assign cpu_masterd_o = cpu_valid & cpu_addr[31:28] >= NUBUS_CONTROLLER_ADDR_START;
 
 endmodule
 

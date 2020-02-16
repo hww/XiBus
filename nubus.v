@@ -2,7 +2,8 @@ module nubus
   #(
     parameter SLOTS_ADDRESS  = 'hF, // All slots starts with address 0xFXXXXXXX
     parameter EXPANSION_MASK = 'hC, 
-    parameter EXPANSION_ADDR = 'h0
+    parameter EXPANSION_ADDR = 'h0 ,
+    parameter NUBUS_CONTROLLER_ADDR_START = 6  
     )
 
    (
@@ -68,7 +69,7 @@ module nubus
    wire           mst_adrcyn, mst_dtacyn, mst_lockedn, mst_arbdn, 
                   mst_busyn, mst_ownern, mst_arbcyn;
    wire [31:0]    cpu_ad;
-   wire           cpu_tm0n, nub_qstoen, drv_tmoen, cpu_tm1n, cpu_tm0;
+   wire           cpu_tm0n, nub_qstoen, drv_tmoen, cpu_tm1n, cpu_tm0, cpu_masterd;
 
    // ==========================================================================
    // Drive NuBus address-data line 
@@ -150,7 +151,7 @@ module nubus
       .nub_ackn(nub_ackn), // End of transfer
       .arb_grant(arb_grant), // Grant access
       .cpu_lock(cpu_lock), // Address line
-      .cpu_valid(cpu_valid), // Master mode (delayed)
+      .cpu_masterd(cpu_masterd), // Master mode (delayed)
 
       .mst_lockedn_o(mst_lockedn), // Locked or not tranfer
       .mst_arbdn_o(mst_arbdn),
@@ -193,17 +194,22 @@ module nubus
    assign cpu_rdata = ~nub_adn;
    assign cpu_ready = ~nub_ackn & nub_startn;
 
-   cpu_bus UCPUBus
+   cpu_bus 
+   #(
+     .NUBUS_CONTROLLER_ADDR_START(NUBUS_CONTROLLER_ADDR_START)
+   )
+   UCPUBus
      (
       .mst_adrcyn(mst_adrcyn),
       .cpu_write(cpu_write),
       .cpu_addr(cpu_addr),
       .cpu_wdata(cpu_wdata),
-
+      .cpu_valid(cpu_valid),
       .cpu_ad_o(cpu_ad),
       .cpu_tm1n_o(cpu_tm1n),
       .cpu_tm0n_o(cpu_tm0n),
-      .cpu_error_o(cpu_error)
+      .cpu_error_o(cpu_error),
+      .cpu_masterd_o(cpu_masterd)
    );
 
 endmodule

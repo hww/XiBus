@@ -33,7 +33,7 @@ module nubus_master
    input        nub_ackn, // End of transfer
    input        arb_grant, // Grant access
    input        cpu_lock, // Locked by CPU
-   input        cpu_valid, // Slv_master mode access
+   input        cpu_masterd, // Slv_master mode access
    output       mst_lockedn_o, // Locked or not tranfer
    output       mst_arbdn_o,
    output       mst_busyn_o,
@@ -73,7 +73,7 @@ module nubus_master
       end else begin
 
 	 arbcy  <= slv_master &
-                   cpu_valid & ~owner & ~arbcy & ~adrcy & ~dtacy & ~rqst
+         cpu_masterd & ~owner & ~arbcy & ~adrcy & ~dtacy & ~rqst
 		   /*wait for RQST& unsserted, while idle*/
 		   | slv_master & arbcy & ~owner & ~reset
 		   /*non-locking, hold for START&*/

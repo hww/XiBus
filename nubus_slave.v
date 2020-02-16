@@ -56,7 +56,8 @@ module nubus_slave
    assign slv_tm0n_o = tm0nl;
    assign mem_valid_o = mem_valid;
    assign slv_ackcyn_o = ~ackcy;
-
+   assign mem_addr_o = mem_addr;
+   
    always @(posedge clk or posedge reset) begin : proc_slave
       if (reset) begin
 	       slaven <= 1;
@@ -104,24 +105,31 @@ module nubus_slave
                        | mem_valid * ~ackcy;
       end
   end
-  
-  // Slave address recorded at the NuBus start cycle.
-  reg [31:0]     mem_addr;
-  assign mem_addr_o = mem_addr;
-  
-  always @(negedge nub_clkn or posedge reset) begin : proc_ad_slave
-    if (reset) begin
-      mem_addr <= 0;
-    end else if (~nub_startn) begin
-      mem_addr <= ~nub_adn;
-    end
-  end
 
+   // ==========================================================================
+   // Slave address recorded at the NuBus start cycle.
+   // ==========================================================================
+
+   reg [31:0]     mem_addr;
+
+  
+   always @(negedge nub_clkn or posedge reset) begin : proc_ad_slave
+      if (reset) begin
+         mem_addr <= 0;
+      end else if (~nub_startn) begin
+         mem_addr <= ~nub_adn;
+      end
+   end
+
+   // ==========================================================================
+   // Write strobes
+   // ==========================================================================
+   
    wire a1ln = ~mem_addr[1];
    wire a0ln = ~mem_addr[0];
-   assign mem_wdata_o = ~nub_adn;
-
    wire write = mem_valid & ~slv_tm1n_o;
+   
+   assign mem_wdata_o = ~nub_adn;
 
    assign mem_write_o[3]   =   write & ~a1ln & ~a0ln & ~slv_tm0n_o
                              /* Byte 3 */
@@ -160,4 +168,5 @@ module nubus_slave
    wire [3:0] nub_id = ~nub_idn;
    assign mem_myslot = nub_id == mem_addr[27:24] & mem_addr[31:28] == SLOTS_ADDRESS;
    assign mem_myexp = (mem_addr[31:28] & EXPANSION_MASK) == EXPANSION_ADDR;
+   
 endmodule

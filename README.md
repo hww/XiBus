@@ -56,3 +56,6 @@ cpu_bus.v - Encoder from PicoRV bus to this NuBus controller
 
 > make test_master
 
+## Data Lines Digram
+
+![Data Lines](/docs/nubus_contr_data_address_flow.png)

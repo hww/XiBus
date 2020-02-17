@@ -7,9 +7,11 @@ Implementation of NuBus controller with Verilog
   - [x] Arbiter testbench
 - [x] Slave
   - [x] Slave testbench
+  - [x] Superslots
+  - [x] Local memory access with NuBus
 - [x] Master
   - [x] Master testbench
-    [x] Master timeout error
+  - [x] Master timeout error
   - [ ] Multimaster bus transfer test bench
 - [ ] Bus transfer errors
   - [ ] Bus transfer errors testbench

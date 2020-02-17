@@ -3,12 +3,19 @@ Implementation of NuBus controller with Verilog
 
 ## ToDo List
 
-- [x] Arbiter
+- [x] NuBus Arbiter
   - [x] Arbiter testbench
-- [x] Slave
-  - [x] Slave testbench
-- [x] Master
-  - [x] Master testbench
+- [x] NuBus slave
+  - [x] Testbench
+  - [x] Slots
+  - [x] Superslots
+  - [x] Local memory access 
+  - [-] ROM
+  - [-] IO 
+  - [-] RAM
+- [x] NuBus master
+  - [x] Testbench
+  - [x] Master timeout error
   - [ ] Multimaster bus transfer test bench
 - [ ] Bus transfer errors
   - [ ] Bus transfer errors testbench

@@ -9,6 +9,7 @@ Implementation of NuBus controller with Verilog
   - [x] Slave testbench
 - [x] Master
   - [x] Master testbench
+    [x] Master timeout error
   - [ ] Multimaster bus transfer test bench
 - [ ] Bus transfer errors
   - [ ] Bus transfer errors testbench

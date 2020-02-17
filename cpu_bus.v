@@ -9,7 +9,7 @@ module cpu_bus
    output        cpu_tm1n_o,
    output        cpu_tm0n_o,
    output        cpu_error_o,
-   output        cpu_masterd_o
+   output        cpu_masterd_o,
    );
 
    // ==========================================================================

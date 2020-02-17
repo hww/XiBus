@@ -18,7 +18,9 @@ module nubus
     // makes local space address $00000000-$50000000
     parameter LOCAL_SPACE_EXPOSED_TO_NUBUS = 0,
     parameter LOCAL_SPACE_START = 0,
-    parameter LOCAL_SPACE_END = 5
+    parameter LOCAL_SPACE_END = 5,
+    // Generate parity without ECC memory
+    parameter NON_ECC_PARITY = 1
     )
 
    (
@@ -59,7 +61,8 @@ module nubus
     output [ 3:0] cpu_write,
     output [31:0] cpu_rdata,
     input         cpu_lock,
-
+    input         cpu_errors_clr,
+    output [3:0]  cpu_errors,
     /* Debugging and utilities */
 
     // This card mapped to only one slot
@@ -103,7 +106,16 @@ module nubus
                        /*MASTER data cycle, when writing*/
                        ;
    // Output to nubus the 
-   assign nub_adn = nub_adoe ? ~nub_ad : 'bZ;
+   assign nub_adn  = nub_adoe ? ~nub_ad : 'bZ;
+
+   // ==========================================================================
+   // Parity checking
+   // ==========================================================================
+
+   assign parity   = ~^nub_adn;
+   assign nub_spn  = NON_ECC_PARITY &  nub_adoe ? parity : 'bZ;
+   assign nub_spvn = NON_ECC_PARITY &  nub_adoe ? 0 : 'bZ;
+   wire   sp_error = NON_ECC_PARITY & ~nub_adoe & ~nub_spvn & nub_spn == parity;
 
    // ==========================================================================
    // Arbiter Interface
@@ -230,7 +242,36 @@ module nubus
       .cpu_tm1n_o(cpu_tm1n),
       .cpu_tm0n_o(cpu_tm0n),
       .cpu_error_o(cpu_error)
+
    );
+
+   // ==========================================================================
+   // Error Register
+   // ==========================================================================
+
+   reg [4:0] errors;
+
+   always @(negedge nub_clkn or negedge nub_resetn) : proc_cpu_errors
+   begin
+	if (~nub_resetn) begin
+	  errors <= 0;
+        end else begin
+          if (cpu_errors_clr) begin
+	     errors <= 0;
+          end else begin
+          // NuBus timeout flag
+	  errors[0] <= errors[0] 
+                     | mst_timeot & ~mst_ackn;
+          // NuBus partity error
+	  errors[1] <= errors[1] 
+                     | sp_error & ~nub_spv;
+          // CPU access to unaligned data
+	  errors[2] <= errors[2] 
+                     | cpu_error & cpu_valid;
+          end
+        end
+   end
+   assign cpu_errors = errors;
 
 endmodule
 

@@ -30,7 +30,7 @@ module nubus_driver
    input  mst_lockedn, // Locked or not transfer
    input  mst_tm1n, // Address ines
    input  mst_tm0n, // Address ines
-
+   input  mst_timeout,
    output nub_tm0n_o, // Transfer mode
    output nub_tm1n_o, // Transfer mode
    output nub_ackn_o, // Achnowlege
@@ -47,13 +47,13 @@ module nubus_driver
    // Rename or invert inputs
    // ----------------------------------------------------
 
-   wire   ackcy = ~slv_ackcyn;
+   wire   ackcy = ~slv_ackcyn | mst_timeout;
    wire   arbcy = ~mst_arbcyn;
    wire   adrcy = ~mst_adrcyn;
    wire   dtacy = ~mst_dtacyn;
    wire   owner = ~mst_ownern;
    wire   locked = ~mst_lockedn;
-   
+   wire   timeout = mst_timeout;
    wire   tm1n = mst_tm1n;
    wire   tm0n = mst_tm0n;
    
@@ -95,15 +95,15 @@ module nubus_driver
 			/* for NULL-ATTN, LOCK-ATTN */
 	         	;
    // Transmission mode 
-   assign tm1		= ackcy				
+   assign tm1		= ackcy & ~timeout				
 			/* SLAVE response */
-		     	| owner & adrcy & ~tm1n 	
+		     	| owner & adrcy & ~tm1n
 		     	/* START* at address cycle */
-		     	| owner & ~adrcy & ~locked
+		     	| owner & ~adrcy & ~locked & ~timeout
                         /* set for NULL-ATTN */
                         ;
    // Transmission mode 
-   assign tm0		= ackcy			
+   assign tm0		= ackcy		
 			/* SLAVE response */
 		     	| owner & adrcy & ~tm0n	
 		     	/* START* at address cycle */

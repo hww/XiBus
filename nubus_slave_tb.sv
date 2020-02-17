@@ -86,8 +86,8 @@ module nubus_slave_tb ();
       .mem_addr(mem_addr),
       .mem_wdata(mem_wdata),
       .mem_rdata(mem_rdata),
-      .mem_myslot(mem_myslot),
-      .mem_myexp(mem_myep),
+      .mem_slot(mem_myslot),
+      .mem_super(mem_myep),
 
        // Master device
       .cpu_valid(cpu_valid),

@@ -1,9 +1,24 @@
 module nubus
   #(
-    parameter SLOTS_ADDRESS  = 'hF, // All slots starts with address 0xFXXXXXXX
-    parameter EXPANSION_MASK = 'hC, 
-    parameter EXPANSION_ADDR = 'h0 ,
-    parameter NUBUS_CONTROLLER_ADDR_START = 6  
+    // Activate simple or standard memory map
+    //   1 - slots mapped as $s000 0000
+    //   0 - standart scheme $as00 0000
+    //       where:
+    //       a - is SLOTS_ADDRESS
+    //       s - is the slot ID
+    parameter SIMPLE_MAP = 0,
+    // All slots area starts with address $FXXX XXXX
+    parameter SLOTS_ADDRESS  = 'hF, 
+    // All superslots starts at $9000 0000
+    parameter SUPERSLOTS_ADDRESS = 'h9, 
+    // Watch dog timer bits. Master controller will terminate transfer
+    // after (2 ^ WDT_W) clocks
+    parameter WDT_W = 8,
+    // Local space of card start and end addres. For example 0-5
+    // makes local space address $00000000-$50000000
+    parameter LOCAL_SPACE_EXPOSED_TO_NUBUS = 0,
+    parameter LOCAL_SPACE_START = 0,
+    parameter LOCAL_SPACE_END = 5
     )
 
    (
@@ -48,9 +63,9 @@ module nubus
     /* Debugging and utilities */
 
     // This card mapped to only one slot
-    output        mem_myslot,
+    output        mem_slot,
     // This card can have memory space in below xF0XXXXX addresses
-    output        mem_myexp
+    output        mem_super
   );
 
    // ==========================================================================
@@ -66,7 +81,7 @@ module nubus
 
    wire           arb_grant;
    wire           slv_master, slv_slave, slv_tm1n, slv_tm0n, slv_ackcyn, slv_myslot;
-   wire           mst_adrcyn, mst_dtacyn, mst_lockedn, mst_arbdn, 
+   wire           mst_adrcyn, mst_dtacyn, mst_lockedn, mst_arbdn, mst_timeout, 
                   mst_busyn, mst_ownern, mst_arbcyn;
    wire [31:0]    cpu_ad;
    wire           cpu_tm0n, nub_qstoen, drv_tmoen, cpu_tm1n, cpu_tm0, cpu_masterd;
@@ -109,8 +124,11 @@ module nubus
    nubus_slave 
    #(
       .SLOTS_ADDRESS (SLOTS_ADDRESS), 
-      .EXPANSION_MASK(EXPANSION_MASK), 
-      .EXPANSION_ADDR(EXPANSION_ADDR)
+      .SUPERSLOTS_ADDRESS(SUPERSLOTS_ADDRESS),
+      .SIMPLE_MAP(SIMPLE_MAP),
+      .LOCAL_SPACE_EXPOSED_TO_NUBUS(LOCAL_SPACE_EXPOSED_TO_NUBUS),
+      .LOCAL_SPACE_START(LOCAL_SPACE_START),
+      .LOCAL_SPACE_END(LOCAL_SPACE_END)
    )
    USlave
      (
@@ -124,7 +142,7 @@ module nubus
       .nub_idn(nub_idn),
       .mem_ready(mem_ready),
       .drv_mstdn(drv_mstdn),
-
+      .mst_timeout(mst_timeout),
       .slv_slave_o(slv_slave), // Slave mode
       .slv_tm1n_o(slv_tm1n), // Latched transition mode 1 (Read/Write)
       .slv_tm0n_o(slv_tm0n),
@@ -134,15 +152,19 @@ module nubus
       .mem_addr_o(mem_addr),
       .mem_write_o(mem_write),
       .mem_wdata_o(mem_wdata), 
-      .mem_myslot(mem_myslot), // Slot selected
-      .mem_myexp(mem_myexp) // Slot selected
+      .mem_slot_o(mem_slot), // Slot selected
+      .mem_super_o(mem_super) // Slot selected
       );
 
    // ==========================================================================
    // Master FSM
    // ==========================================================================
 
-   nubus_master UMaster
+   nubus_master
+    #(
+      .WDT_W(WDT_W)
+     ) 
+     UMaster
      (
       .nub_clkn(nub_clkn), // Clock
       .nub_resetn(nub_resetn), // Reset
@@ -151,7 +173,7 @@ module nubus
       .nub_ackn(nub_ackn), // End of transfer
       .arb_grant(arb_grant), // Grant access
       .cpu_lock(cpu_lock), // Address line
-      .cpu_masterd(cpu_masterd), // Master mode (delayed)
+      .cpu_masterd(cpu_valid), // Master mode (delayed)
 
       .mst_lockedn_o(mst_lockedn), // Locked or not tranfer
       .mst_arbdn_o(mst_arbdn),
@@ -159,7 +181,8 @@ module nubus
       .mst_ownern_o(mst_ownern), // Address or data transfer
       .mst_dtacyn_o(mst_dtacyn), // Data strobe
       .mst_adrcyn_o(mst_adrcyn), // Address strobe
-      .mst_arbcyn_o(mst_arbcyn) // Arbiter enabled
+      .mst_arbcyn_o(mst_arbcyn), // Arbiter enabled
+      .mst_timeout_o(mst_timeout)
    );
 
    // ==========================================================================
@@ -176,7 +199,7 @@ module nubus
       .mst_lockedn(mst_lockedn), // Locked or not transfer
       .mst_tm1n(cpu_tm1n), // Address ines
       .mst_tm0n(cpu_tm0n), // Address ines
-
+      .mst_timeout(mst_timeout),
       .nub_tm0n_o(nub_tm0n), // Transfer mode
       .nub_tm1n_o(nub_tm1n), // Transfer mode
       .nub_ackn_o(nub_ackn), // Achnowlege
@@ -196,7 +219,6 @@ module nubus
 
    cpu_bus 
    #(
-     .NUBUS_CONTROLLER_ADDR_START(NUBUS_CONTROLLER_ADDR_START)
    )
    UCPUBus
      (
@@ -204,12 +226,10 @@ module nubus
       .cpu_write(cpu_write),
       .cpu_addr(cpu_addr),
       .cpu_wdata(cpu_wdata),
-      .cpu_valid(cpu_valid),
       .cpu_ad_o(cpu_ad),
       .cpu_tm1n_o(cpu_tm1n),
       .cpu_tm0n_o(cpu_tm0n),
-      .cpu_error_o(cpu_error),
-      .cpu_masterd_o(cpu_masterd)
+      .cpu_error_o(cpu_error)
    );
 
 endmodule

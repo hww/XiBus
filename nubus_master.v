@@ -25,6 +25,11 @@
  */
 
 module nubus_master 
+  #(
+    // Watch dog timer bits. Master controller will terminate transfer
+    // after (2 ^ WDT_W) clocks
+    parameter WDT_W = 8
+  )
   (
    input        nub_clkn, // Clock
    input        nub_resetn, // Reset
@@ -40,10 +45,12 @@ module nubus_master
    output       mst_ownern_o, // Address or data transfer
    output       mst_dtacyn_o, // Data strobe
    output       mst_adrcyn_o, // Address strobe
-   output       mst_arbcyn_o // Arbiter enabled
+   output       mst_arbcyn_o, // Arbiter enabled
+   output       mst_timeout_o
    );
 
    reg    locked, arbdn, busy, owner, dtacy, adrcy, arbcy;
+   wire   timeout;
 
    assign mst_lockedn_o = ~locked;
    assign mst_arbdn_o = arbdn;
@@ -52,12 +59,14 @@ module nubus_master
    assign mst_dtacyn_o = ~dtacy;
    assign mst_adrcyn_o = ~adrcy;
    assign mst_arbcyn_o = ~arbcy;
+   assign mst_timeout_o = timeout;
 
    wire   clkn = nub_clkn;
    wire   reset = ~nub_resetn;
-   wire   ack = ~nub_ackn;
+   wire   ack = ~nub_ackn | timeout;
    wire   start = ~nub_startn;
    wire   rqst = ~nub_rqstn;
+
 
    wire slv_master = 1;
    
@@ -121,4 +130,23 @@ module nubus_master
       end
    end
 
+   // ==========================================================================
+   // Master watch dog timer
+   // ==========================================================================
+
+   reg [WDT_W:0] wdt;
+   
+   always @(posedge clkn or posedge reset) begin : proc_wdt
+      if(reset) begin
+        wdt <= 0;
+      end else begin
+         if (dtacy) begin
+            wdt = wdt + 1;
+         end else begin
+            wdt <= 0;
+         end
+      end
+   end
+   assign timeout = dtacy & wdt[WDT_W];
+  
 endmodule

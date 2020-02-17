@@ -10,9 +10,9 @@ Implementation of NuBus controller with Verilog
   - [x] Slots
   - [x] Superslots
   - [x] Local memory access 
-  - [-] ROM
-  - [-] IO 
-  - [-] RAM
+  - [ ] ROM
+  - [ ] IO 
+  - [ ] RAM
 - [x] NuBus master
   - [x] Testbench
   - [x] Master timeout error

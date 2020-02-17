@@ -10,18 +10,23 @@ Implementation of NuBus controller with Verilog
   - [x] Slots
   - [x] Superslots
   - [x] Local memory access 
-  - [ ] ROM
-  - [ ] IO 
-  - [ ] RAM
 - [x] NuBus master
   - [x] Testbench
   - [x] Master timeout error
-  - [ ] Multimaster bus transfer test bench
+  - [ ] Multimaster bus transfer testbench
 - [ ] Bus transfer errors
+  - [x] NuBus - Parity error
+  - [x] Master - Timeout
+  - [x] Master - Non aligned memory access
+  - [x] Slave - Memory acccess error (as input pin on memory interface)
+  - [ ] Slave - Try again later (as input pin on memory interface)
+  - [ ] Slave - Parity for ECC memory
   - [ ] Bus transfer errors testbench
 - [ ] Interrupts 
+  - [ ] Interrupt on bus error
+  - [ ] Interrupt on unused memory access
+  - [ ] Non master request (NMRQ)
   - [ ] Interrupts testbench 
-- [ ] Parity
 - [ ] Block transfer
   - [ ] Block transfer testbench
 

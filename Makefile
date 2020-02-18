@@ -6,10 +6,10 @@ ICARUS_FLAGS = -g2012
 # Test access virtual Master to slave
 # ==========================================
 
-slave: nubus_slave_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv cpu_bus.v
+slave: nubus_slave_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv nubus_cpubus.v nubus_errors.v
 	iverilog $(ICARUS_FLAGS) -o nubus_slave_tb.vvp $^ 
 
-test_slave: nubus_slave_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv cpu_bus.v
+test_slave: nubus_slave_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv nubus_cpubus.v nubus_errors.v
 	iverilog $(ICARUS_FLAGS) -o nubus_slave_tb.vvp $^
 	vvp nubus_slave_tb.vvp
 
@@ -17,10 +17,10 @@ test_slave: nubus_slave_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter
 # Test access NuBus Master to same NuBus slave
 # ==========================================
 
-master: nubus_master_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv cpu_bus.v
+master: nubus_master_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv nubus_cpubus.v nubus_errors.v
 	iverilog $(ICARUS_FLAGS) -o nubus_master_tb.vvp $^ 
 
-test_master: nubus_master_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv cpu_bus.v
+test_master: nubus_master_tb.sv nubus.v nubus_master.v nubus_slave.v nubus_arbiter.v nubus_driver.v nubus_memory.sv nubus_cpubus.v nubus_errors.v
 	iverilog $(ICARUS_FLAGS) -o nubus_master_tb.vvp $^
 	vvp nubus_master_tb.vvp
 

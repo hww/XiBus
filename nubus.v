@@ -51,6 +51,8 @@ module nubus
     output [ 3:0] mem_write,
     input         mem_ready,
     input [31:0]  mem_rdata,
+    input         mem_error,
+    input         mem_tryagain,
 
     /* Processor bus signals connected to processor */
 
@@ -61,7 +63,7 @@ module nubus
     output [ 3:0] cpu_write,
     output [31:0] cpu_rdata,
     input         cpu_lock,
-    input         cpu_errors_clr,
+    input         cpu_errclr,
     output [3:0]  cpu_errors,
     /* Debugging and utilities */
 
@@ -70,6 +72,8 @@ module nubus
     // This card can have memory space in below xF0XXXXX addresses
     output        mem_super
   );
+
+  `include "nubus_inc.sv"
 
    // ==========================================================================
    // Colock and reset
@@ -88,6 +92,7 @@ module nubus
                   mst_busyn, mst_ownern, mst_arbcyn;
    wire [31:0]    cpu_ad;
    wire           cpu_tm0n, nub_qstoen, drv_tmoen, cpu_tm1n, cpu_tm0, cpu_masterd;
+   wire [1:0]     mis_errorn;
 
    // ==========================================================================
    // Drive NuBus address-data line 
@@ -115,7 +120,7 @@ module nubus
    assign parity   = ~^nub_adn;
    assign nub_spn  = NON_ECC_PARITY &  nub_adoe ? parity : 'bZ;
    assign nub_spvn = NON_ECC_PARITY &  nub_adoe ? 0 : 'bZ;
-   wire   sp_error = NON_ECC_PARITY & ~nub_adoe & ~nub_spvn & nub_spn == parity;
+   wire   nub_noparity = NON_ECC_PARITY & ~nub_adoe & ~nub_spvn & nub_spn == parity;
 
    // ==========================================================================
    // Arbiter Interface
@@ -212,6 +217,7 @@ module nubus
       .mst_tm1n(cpu_tm1n), // Address ines
       .mst_tm0n(cpu_tm0n), // Address ines
       .mst_timeout(mst_timeout),
+      .mis_errorn(mis_errorn),
       .nub_tm0n_o(nub_tm0n), // Transfer mode
       .nub_tm1n_o(nub_tm1n), // Transfer mode
       .nub_ackn_o(nub_ackn), // Achnowlege
@@ -229,49 +235,37 @@ module nubus
    assign cpu_rdata = ~nub_adn;
    assign cpu_ready = ~nub_ackn & nub_startn;
 
-   cpu_bus 
+   nubus_cpubus
    #(
    )
    UCPUBus
      (
+      .nub_clkn(nub_clkn),
+      .nub_resetn(nub_resetn),
       .mst_adrcyn(mst_adrcyn),
+      .cpu_valid(cpu_valid),
       .cpu_write(cpu_write),
       .cpu_addr(cpu_addr),
       .cpu_wdata(cpu_wdata),
       .cpu_ad_o(cpu_ad),
       .cpu_tm1n_o(cpu_tm1n),
-      .cpu_tm0n_o(cpu_tm0n),
-      .cpu_error_o(cpu_error)
-
+      .cpu_tm0n_o(cpu_tm0n)
    );
 
-   // ==========================================================================
-   // Error Register
-   // ==========================================================================
+   nubus_errors_reg UErrorsReg
+     (
+      .nub_clkn(nub_clkn),
+      .nub_resetn(nub_resetn),
+      .mst_timeout(msk_timeout),
+      .mem_error(mem_error),
+      .nub_noparity(nub_noparity),
+      .cpu_error(cpu_error),
+      .cpu_errclr(cpu_errclr),
+      .cpu_errors_o(cpu_errors),
+      .mis_errorn_o(mis_errorn)
+      );
 
-   reg [4:0] errors;
 
-   always @(negedge nub_clkn or negedge nub_resetn) : proc_cpu_errors
-   begin
-	if (~nub_resetn) begin
-	  errors <= 0;
-        end else begin
-          if (cpu_errors_clr) begin
-	     errors <= 0;
-          end else begin
-          // NuBus timeout flag
-	  errors[0] <= errors[0] 
-                     | mst_timeot & ~mst_ackn;
-          // NuBus partity error
-	  errors[1] <= errors[1] 
-                     | sp_error & ~nub_spv;
-          // CPU access to unaligned data
-	  errors[2] <= errors[2] 
-                     | cpu_error & cpu_valid;
-          end
-        end
-   end
-   assign cpu_errors = errors;
 
 endmodule
 

@@ -79,6 +79,8 @@ module nubus_master_tb ();
    tri1 [31:0]         mem_rdata;
    tri1                mem_myslot;
    tri1                mem_myexp;
+   tri0                mem_tryagain;
+   tri0                mem_error;
 
    tri0                cpu_valid;
    tri1 [31:0]         cpu_addr;
@@ -126,6 +128,8 @@ module nubus_master_tb ();
       .mem_rdata(mem_rdata),
       .mem_slot(mem_myslot),
       .mem_super(mem_myep),
+      .mem_error(mem_error),
+      .mem_tryagain(mem_tryagain),
 
        // Master device
       .cpu_valid(cpu_valid),

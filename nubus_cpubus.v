@@ -1,7 +1,10 @@
 
-module cpu_bus
+module nubus_cpubus
   (
+   input         nub_clkn,
+   input         nub_resetn,
    input         mst_adrcyn,
+   input         cpu_valid,
    input [3:0]   cpu_write,
    input [31:0]  cpu_addr,
    input [31:0]  cpu_wdata,
@@ -9,7 +12,7 @@ module cpu_bus
    output        cpu_tm1n_o,
    output        cpu_tm0n_o,
    output        cpu_error_o,
-   output        cpu_masterd_o,
+   output        cpu_masterd_o
    );
 
    // ==========================================================================
@@ -46,9 +49,10 @@ module cpu_bus
    assign cpu_tma[ 1:0] = ~tmadn[1:0];
    assign cpu_ad_o = ~mst_adrcyn ? cpu_tma : cpu_wdata;
 
-   assign cpu_error_o = tmadn[4];
+   assign cpu_error_o = tmadn[4] & cpu_valid;
    assign cpu_tm1n_o = tmadn[3];
    assign cpu_tm0n_o = tmadn[2];
+
 
 endmodule
 

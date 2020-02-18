@@ -1,16 +1,23 @@
-D:/projects/github/nubus/nubus_driver.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_driver.v
+D:/projects/github/nubus/nubus_memory.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_memory.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module nubus_memory
+
+Top level modules:
+	nubus_memory
+
+} {} {}} D:/projects/github/nubus/nubus_driver.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_driver.v
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
 -- Compiling module nubus_driver
 
 Top level modules:
 	nubus_driver
 
-} {} {}} D:/projects/github/nubus/nubus_memory.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_memory.sv
+} {} {}} D:/projects/github/nubus/nubus_master_tb.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_master_tb.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module nubus_memory
+-- Compiling module nubus_master_tb
 
 Top level modules:
-	nubus_memory
+	nubus_master_tb
 
 } {} {}} D:/projects/github/nubus/nubus_arbiter_tb.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_arbiter_tb.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
@@ -45,6 +52,12 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 
 Top level modules:
 	nubus_arbiter
+
+} {} {}} D:/projects/github/nubus/nubus_tb_inc.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_tb_inc.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+
+Top level modules:
+	--none--
 
 } {} {}} D:/projects/github/nubus/nubus_slave.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_slave.v
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016

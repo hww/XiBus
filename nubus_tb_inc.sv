@@ -28,7 +28,7 @@ function string get_status_str (input [1:0] tmn);
    begin
       case (tmn)
         TMN_TRY_AGAIN_LATER: get_status_str = "TryAgainLater";
-        TMN_TIMEOUT_ERROR:   get_status_str = "Timeout Error";
+        TMN_TIMEOUT_ERROR:   get_status_str = "TimeoutError";
         TMN_ERROR:           get_status_str = "Error";
         TMN_COMPLETE:        get_status_str = "Complete";
       endcase // case (tmn)
@@ -38,23 +38,23 @@ endfunction // get_status
 function string get_start_str (input [3:0] tmadn);
    begin
      case (tmadn)
-     TMADN_RD_WORD:   get_start_str = "Read Word";
-     TMADN_RD_HALF_0: get_start_str = "Read Half 0";
-     TMADN_RD_BLOCK:  get_start_str = "Read Block";
-     TMADN_RD_HALF_1: get_start_str = "Read Half 1";
-     TMADN_RD_BYTE_0: get_start_str = "Read Byte 0";
-     TMADN_RD_BYTE_1: get_start_str = "Read Byte 1";
-     TMADN_RD_BYTE_2: get_start_str = "Read Byte 2";
-     TMADN_RD_BYTE_3: get_start_str = "Read Byte 3";
+     TMADN_RD_WORD:   get_start_str = "ReadWord";
+     TMADN_RD_HALF_0: get_start_str = "ReadHalf0";
+     TMADN_RD_BLOCK:  get_start_str = "ReadBlock";
+     TMADN_RD_HALF_1: get_start_str = "ReadHalf1";
+     TMADN_RD_BYTE_0: get_start_str = "ReadByte0";
+     TMADN_RD_BYTE_1: get_start_str = "ReadByte1";
+     TMADN_RD_BYTE_2: get_start_str = "ReadByte2";
+     TMADN_RD_BYTE_3: get_start_str = "ReadByte3";
 
-     TMADN_WR_WORD:  get_start_str  = "Write Word";
-     TMADN_WR_HALF_0: get_start_str = "Write Half 0";
-     TMADN_WR_BLOCK:  get_start_str = "Write Block";
-     TMADN_WR_HALF_1: get_start_str = "Write Half 1";
-     TMADN_WR_BYTE_0: get_start_str = "Write Byte 0";
-     TMADN_WR_BYTE_1: get_start_str = "Write Byte 1";
-     TMADN_WR_BYTE_2: get_start_str = "Write Byte 2";
-     TMADN_WR_BYTE_3: get_start_str = "Write Byte 3";
+     TMADN_WR_WORD:  get_start_str  = "WriteWord";
+     TMADN_WR_HALF_0: get_start_str = "WriteHalf0";
+     TMADN_WR_BLOCK:  get_start_str = "WriteBlock";
+     TMADN_WR_HALF_1: get_start_str = "WriteHalf1";
+     TMADN_WR_BYTE_0: get_start_str = "WriteByte0";
+     TMADN_WR_BYTE_1: get_start_str = "WriteByte1";
+     TMADN_WR_BYTE_2: get_start_str = "WriteByte2";
+     TMADN_WR_BYTE_3: get_start_str = "WriteByte3";
      endcase // case (tmn)
    end 
 endfunction // get_start_str

@@ -89,6 +89,7 @@ module nubus_master_tb ();
    tri1 [3:0]          cpu_write;
    tri1 [31:0]         cpu_rdata;
    tri1                cpu_lock;
+   tri0                cpu_eclr;
 
    assign nub_idn = ~ TEST_CARD_ID;
 
@@ -126,7 +127,7 @@ module nubus_master_tb ();
       .mem_addr(mem_addr),
       .mem_wdata(mem_wdata),
       .mem_rdata(mem_rdata),
-      .mem_slot(mem_myslot),
+      .mem_myslot(mem_myslot),
       .mem_super(mem_myep),
       .mem_error(mem_error),
       .mem_tryagain(mem_tryagain),
@@ -138,7 +139,8 @@ module nubus_master_tb ();
       .cpu_ready(cpu_ready),
       .cpu_write(cpu_write),
       .cpu_rdata(cpu_rdata),
-      .cpu_lock(cpu_lock)
+      .cpu_lock(cpu_lock),
+      .cpu_eclr(cpu_eclr)
       );
 
    reg         tst_clkn;
@@ -216,32 +218,31 @@ module nubus_master_tb ();
       input [31:0] data;
       begin
       @ (posedge nub_clkn);
-      $display  ("WORD ---------------------------");
+
       write_word(WRITE_WR_WORD,   addr+0, data);
       read_word (WRITE_RD_WORD,   addr+0);
       check_word(WRITE_WR_WORD);
-      $display  ("HALF 0 -------------------------");
+
       write_word(WRITE_WR_HALF_0, addr+4, data);
       read_word (WRITE_RD_HALF_0, addr+4);
       check_word(WRITE_WR_HALF_0);
-      $display  ("HALF 1 -------------------------");
+
       write_word(WRITE_WR_HALF_1, addr+8, data);
       read_word (WRITE_RD_HALF_1, addr+8);
       check_word(WRITE_WR_HALF_1);
 
-      $display  ("BYTE 0 -------------------------");
       write_word(WRITE_WR_BYTE_0,  addr+12, data);
       read_word (WRITE_RD_BYTE_0,  addr+12);
       check_word(WRITE_WR_BYTE_0);
-      $display  ("BYTE 1 -------------------------");
+
       write_word(WRITE_WR_BYTE_1,  addr+16, data);
       read_word (WRITE_RD_BYTE_1,  addr+16);
       check_word(WRITE_WR_BYTE_1);
-      $display  ("BYTE 2 -------------------------");
+
       write_word(WRITE_WR_BYTE_2,  addr+20, data);
       read_word (WRITE_RD_BYTE_2,  addr+20);
       check_word(WRITE_WR_BYTE_2);
-      $display  ("BYTE 3 -------------------------");
+
       write_word(WRITE_WR_BYTE_3,  addr+24, data);
       read_word (WRITE_RD_BYTE_3,  addr+24);
       check_word(WRITE_WR_BYTE_3);

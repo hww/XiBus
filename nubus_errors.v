@@ -1,13 +1,13 @@
-module nubus_errors_reg
+module nubus_errors
   (
    input        nub_clkn,
    input        nub_resetn,
    input        mst_timeout, // Master transaction finished by timeout
-   input        mem_error, // memory controller return error
+   input        mem_error, // memory controller return errors
    input        mem_tryagain, // memory controller not ready to transfer data
    input        nub_noparity, // nubus controller report no-parity
    input        cpu_error, // cpu makes non-aligned access
-   input        cpu_errclr, // reset errors
+   input        cpu_eclr, // reset errors
    output [3:0] cpu_errors_o,
    output [1:0] mis_errorn_o
    );
@@ -26,7 +26,7 @@ module nubus_errors_reg
 	      if (~nub_resetn) begin
 	         errors <= 0;
         end else begin
-           if (cpu_errclr) begin
+           if (cpu_eclr) begin
 	            errors <= 0;
            end else begin
               // NuBus timeout flag

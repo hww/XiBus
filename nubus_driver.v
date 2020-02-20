@@ -79,43 +79,43 @@ module nubus_driver
       
    // Bus request enable
    assign rqstoe  = arbcy & ~adrcy
-			              /* hold untill START* for normal case */
+		    /* hold untill START* for normal case */
                     | arbcy & locked
-			                /* hold untill NULL-ATTN for locked case */
-			                ;
+		    /* hold untill NULL-ATTN for locked case */
+		    ;
    // Transfer mode enable
    assign tmoe    = ackcy
                     /* SLAVE response */
-		                | owner & arbcy & ~dtacy
+		    | owner & arbcy & ~dtacy
                     /* we own bus, while not waiting for ACK */
                     ;
    // Transfer acknowlege
-   assign ack	   	= ackcy
-			              /* slave response */
-	         	        | owner & ~adrcy
-			              /* for NULL-ATTN, LOCK-ATTN */
-	         	        ;
+   assign ack     = ackcy
+		    /* slave response */
+	            | owner & ~adrcy
+		    /* for NULL-ATTN, LOCK-ATTN */
+	            ;
    // Transmission mode 
-   assign tm1		  = ackcy & error1n
-			              /* SLAVE response */
-		     	          | owner & adrcy & ~tm1n
-		     	          /* START* at address cycle */
-		     	          | owner & ~adrcy & ~locked & error1n
-                    /* set for NULL-ATTN */
-                    ;
+   assign tm1      =   ackcy & ~error1n
+		     /* SLAVE response */
+		     | owner & adrcy & ~tm1n
+		     /* START* at address cycle */
+		     | owner & ~adrcy & ~locked & ~ackcy 
+                     /* set for NULL-ATTN */
+                     ;
    // Transmission mode 
-   assign tm0	  	= ackcy & error0n
-			              /* SLAVE response */
-		     	          | owner & adrcy & ~tm0n
-		     	          /* START* at address cycle */
-		     	          | owner & ~adrcy & error0n
-			              /* always set for xxx-ATTN */
-			              ;
+   assign tm0      =   ackcy & ~error0n
+		     /* SLAVE response */
+		     | owner & adrcy & ~tm0n
+		     /* START* at address cycle */
+		     | owner & ~adrcy & ~ackcy
+		     /* always set for xxx-ATTN */
+		     ;
    
-   assign mstdn 	= owner & ~locked & dtacy * ack
-			              /* done all tail end of normal cycle */
-               	    | owner & ~locked & arbcy & ~adrcy & dtacy 
-               	    /* done dor locked cases */
-               	    ;
+   assign mstdn    = owner & ~locked & dtacy * ack
+		     /* done all tail end of normal cycle */
+               	     | owner & ~locked & arbcy & ~adrcy & dtacy 
+               	     /* done dor locked cases */
+               	     ;
    
 endmodule

@@ -73,6 +73,7 @@ add wave -bin -group CPU sim:/nubus_master_tb/UNuBus/cpu_ready
 add wave -divider "Debugging"
 
 
+# Master
 
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/mst_arbdn_o
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/arb_grant
@@ -90,6 +91,8 @@ add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/nub_rqstn
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/nub_startn
 add wave -bin -group Master sim:/nubus_master_tb/UNuBus/UMaster/nub_ackn
 
+# Slave
+
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/nub_clkn
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/nub_resetn
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/nub_startn
@@ -98,13 +101,14 @@ add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/nub_tm0n
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/nub_tm1n
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/mem_ready
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/drv_mstdn
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/mst_timeout
 
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_slave_o
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_tm0n_o
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_tm1n_o
 add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_ackcyn_o
-add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/mem_slot_o
-add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/mem_super_o
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_myslot_o
+add wave -bin -group Slave sim:/nubus_master_tb/UNuBus/USlave/slv_memvalid_o
 
 
 

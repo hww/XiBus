@@ -1,23 +1,23 @@
-D:/projects/github/nubus/nubus_memory.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_memory.sv
+D:/projects/github/nubus/nubus_master_tb.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_master_tb.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module nubus_master_tb
+
+Top level modules:
+	nubus_master_tb
+
+} {} {}} D:/projects/github/nubus/nubus_memory.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_memory.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
 -- Compiling module nubus_memory
 
 Top level modules:
 	nubus_memory
 
-} {} {}} D:/projects/github/nubus/nubus_driver.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_driver.v
+} {} {}} D:/projects/github/nubus/nubus_membus.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_membus.v
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module nubus_driver
+-- Compiling module nubus_membus
 
 Top level modules:
-	nubus_driver
-
-} {} {}} D:/projects/github/nubus/nubus_master_tb.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_master_tb.sv
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module nubus_master_tb
-
-Top level modules:
-	nubus_master_tb
+	nubus_membus
 
 } {} {}} D:/projects/github/nubus/nubus_arbiter_tb.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_arbiter_tb.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
@@ -40,11 +40,266 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 Top level modules:
 	nubus_master
 
+} {} {}} D:/projects/github/nubus/nubus_errors.v {2 {vlog -work work -stats=none D:/projects/github/nubus/nubus_errors.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module nubus_errors
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(6): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(7): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(8): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(9): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(10): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(11): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(12): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(13): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(15): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(16): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(17): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(18): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(19): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(20): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(21): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(22): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(28): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(32): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(33): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(36): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(39): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(40): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(41): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(42): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(48): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(50): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(51): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(52): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(53): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(54): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(55): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(56): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(58): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(59): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(60): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(61): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(62): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(63): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(64): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus_errors.v(15)
+** at nubus_inc.sv(65): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+
+Top level modules:
+	nubus_errors
+
 } {} {}} D:/projects/github/nubus/nubus_inc.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_inc.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
 
 Top level modules:
 	--none--
+
+} {} {}} D:/projects/github/nubus/nubus.v {2 {vlog -work work -stats=none D:/projects/github/nubus/nubus.v
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(7): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(8): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(9): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(10): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(11): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(12): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(13): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(15): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(16): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(17): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(18): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(19): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(20): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(21): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(22): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(28): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(32): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(33): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(36): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(39): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(40): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(41): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(42): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(48): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(50): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(51): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(52): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(53): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(54): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(55): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(56): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(58): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(59): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(60): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(61): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(62): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+-- Compiling module nubus
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(63): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** at nubus_inc.sv(6): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(64): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** at nubus_inc.sv(7): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(65): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** at nubus_inc.sv(8): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+
+** at nubus_inc.sv(9): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+Top level modules:
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+	nubus
+** at nubus_inc.sv(10): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(11): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(12): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(13): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(15): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(16): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(17): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(18): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(19): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(20): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(21): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(22): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(28): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(32): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(33): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(36): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(39): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(40): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(41): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(42): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(48): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(50): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(51): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(52): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(53): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(54): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(55): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(56): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(58): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(59): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(60): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(61): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(62): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(63): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(64): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+** Warning: ** while parsing file included at D:/projects/github/nubus/nubus.v(80)
+** at nubus_inc.sv(65): (vlog-2608) Keyword "unsigned" not allowed here in Verilog 2001.
+
+Top level modules:
+	nubus
 
 } {} {}} D:/projects/github/nubus/nubus_arbiter.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_arbiter.v
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
@@ -52,6 +307,13 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 
 Top level modules:
 	nubus_arbiter
+
+} {} {}} D:/projects/github/nubus/nubus_cpubus.v {1 {vlog -work work -stats=none D:/projects/github/nubus/nubus_cpubus.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module nubus_cpubus
+
+Top level modules:
+	nubus_cpubus
 
 } {} {}} D:/projects/github/nubus/nubus_tb_inc.sv {1 {vlog -work work -sv -stats=none D:/projects/github/nubus/nubus_tb_inc.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016

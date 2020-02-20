@@ -7,7 +7,7 @@ module nubus
     //       a - is SLOTS_ADDRESS
     //       s - is the slot ID
     parameter SIMPLE_MAP = 0,
-    // All slots area starts with address $FXXX XXXX
+    // All slots area starts with addrss $FXXX XXXX
     parameter SLOTS_ADDRESS  = 'hF, 
     // All superslots starts at $9000 0000
     parameter SUPERSLOTS_ADDRESS = 'h9, 
@@ -63,14 +63,18 @@ module nubus
     output [ 3:0] cpu_write,
     output [31:0] cpu_rdata,
     input         cpu_lock,
-    input         cpu_errclr,
+    input         cpu_eclr,
     output [3:0]  cpu_errors,
     /* Debugging and utilities */
 
-    // This card mapped to only one slot
-    output        mem_slot,
-    // This card can have memory space in below xF0XXXXX addresses
-    output        mem_super
+    // Access to slot area
+    output        mem_stdslot,
+    // Access to superslot area ($sXXXXXXX where <s> is card id)
+    output        mem_super,
+    // Access to local memory on the card
+    output        mem_local,
+    // Access to any memory on the card
+    output        mem_myslot
   );
 
   `include "nubus_inc.sv"
@@ -87,28 +91,31 @@ module nubus
    // ==========================================================================
 
    wire           arb_grant;
-   wire           slv_master, slv_slave, slv_tm1n, slv_tm0n, slv_ackcyn, slv_myslot;
+   wire           slv_master, slv_slave, slv_tm1n, slv_tm0n, slv_ackcyn, slv_myslotcy;
    wire           mst_adrcyn, mst_dtacyn, mst_lockedn, mst_arbdn, mst_timeout, 
                   mst_busyn, mst_ownern, mst_arbcyn;
-   wire [31:0]    cpu_ad;
-   wire           cpu_tm0n, nub_qstoen, drv_tmoen, cpu_tm1n, cpu_tm0, cpu_masterd;
+   wire unsigned [31:0] cpu_ad;
+   wire unsigned [31:0] slv_addr;
+   wire           cpu_tm0n, nub_qstoen, drv_tmoen, cpu_tm1n, cpu_tm0, 
+                  cpu_masterd, cpu_error;
    wire [1:0]     mis_errorn;
-
+   wire           drv_mstdn;
+   
    // ==========================================================================
    // Drive NuBus address-data line 
    // ==========================================================================
 
    wire        cpu_adsel = ~mst_adrcyn | ~mst_dtacyn & ~cpu_tm1n;
    // Select nubus data signals
-   wire [31:0] nub_ad   = cpu_adsel  ? cpu_ad : mem_rdata;
+   wire [31:0] nub_ad    = cpu_adsel  ? cpu_ad : mem_rdata;
 
    // When 1 - drive the NuBus AD lines 
-   assign nub_adoe =   slv_slave  & slv_tm1n
-                       /*SLAVE read of card*/
-                       | cpu_valid & ~mst_adrcyn
-                       /*MASTER address cycle*/
-	                     | ~mst_ownern & ~mst_dtacyn & ~cpu_tm1n
-                       /*MASTER data cycle, when writing*/
+   wire        nub_adoe  =   slv_slave  & slv_tm1n
+               /*SLAVE read of card*/
+               | cpu_valid & ~mst_adrcyn
+               /*MASTER address cycle*/
+	       | ~mst_ownern & ~mst_dtacyn & ~cpu_tm1n
+               /*MASTER data cycle, when writing*/
                        ;
    // Output to nubus the 
    assign nub_adn  = nub_adoe ? ~nub_ad : 'bZ;
@@ -117,10 +124,11 @@ module nubus
    // Parity checking
    // ==========================================================================
 
-   assign parity   = ~^nub_adn;
+   wire        parity   = ~^nub_adn;
+   wire        nub_noparity = NON_ECC_PARITY & ~nub_adoe & ~nub_spvn & nub_spn == parity;
+
    assign nub_spn  = NON_ECC_PARITY &  nub_adoe ? parity : 'bZ;
    assign nub_spvn = NON_ECC_PARITY &  nub_adoe ? 0 : 'bZ;
-   wire   nub_noparity = NON_ECC_PARITY & ~nub_adoe & ~nub_spvn & nub_spn == parity;
 
    // ==========================================================================
    // Arbiter Interface
@@ -139,40 +147,40 @@ module nubus
    // ==========================================================================
 
    nubus_slave 
-   #(
-      .SLOTS_ADDRESS (SLOTS_ADDRESS), 
-      .SUPERSLOTS_ADDRESS(SUPERSLOTS_ADDRESS),
-      .SIMPLE_MAP(SIMPLE_MAP),
-      .LOCAL_SPACE_EXPOSED_TO_NUBUS(LOCAL_SPACE_EXPOSED_TO_NUBUS),
-      .LOCAL_SPACE_START(LOCAL_SPACE_START),
-      .LOCAL_SPACE_END(LOCAL_SPACE_END)
-   )
+     #(
+       .SLOTS_ADDRESS (SLOTS_ADDRESS), 
+       .SUPERSLOTS_ADDRESS(SUPERSLOTS_ADDRESS),
+       .SIMPLE_MAP(SIMPLE_MAP),
+       .LOCAL_SPACE_EXPOSED_TO_NUBUS(LOCAL_SPACE_EXPOSED_TO_NUBUS),
+       .LOCAL_SPACE_START(LOCAL_SPACE_START),
+       .LOCAL_SPACE_END(LOCAL_SPACE_END)
+
+       )
    USlave
      (
       .nub_clkn(nub_clkn), // Clock
       .nub_resetn(nub_resetn), // Reset
+      .nub_idn(nub_idn), // Card ID
+      .nub_adn(nub_adn), // Address Data
       .nub_startn(nub_startn), // Transfer start
       .nub_ackn(nub_ackn), // Transfer end
       .nub_tm1n(nub_tm1n), // Transition mode 1 (Read/Write)
       .nub_tm0n(nub_tm0n),
-      .nub_adn(nub_adn),
-      .nub_idn(nub_idn),
       .mem_ready(mem_ready),
-      .drv_mstdn(drv_mstdn),
+      .mem_myslot(mem_myslot),
       .mst_timeout(mst_timeout),
+
       .slv_slave_o(slv_slave), // Slave mode
       .slv_tm1n_o(slv_tm1n), // Latched transition mode 1 (Read/Write)
       .slv_tm0n_o(slv_tm0n),
       .slv_ackcyn_o(slv_ackcyn), // Acknowlege
-      .slv_myslot_o(slv_myslot), 
-      .mem_valid_o(mem_valid),
-      .mem_addr_o(mem_addr),
-      .mem_write_o(mem_write),
-      .mem_wdata_o(mem_wdata), 
-      .mem_slot_o(mem_slot), // Slot selected
-      .mem_super_o(mem_super) // Slot selected
+      .slv_addr_o(slv_addr), // Slave address
+      .slv_stdslot_o(mem_stdslot), // Starndard slot
+      .slv_super_o(mem_super), // Superslot
+      .slv_local_o(mem_local), // Local area
+      .slv_myslotcy_o(slv_myslotcy) // Any slot
       );
-
+    
    // ==========================================================================
    // Master FSM
    // ==========================================================================
@@ -235,10 +243,7 @@ module nubus
    assign cpu_rdata = ~nub_adn;
    assign cpu_ready = ~nub_ackn & nub_startn;
 
-   nubus_cpubus
-   #(
-   )
-   UCPUBus
+   nubus_cpubus UCPUBus
      (
       .nub_clkn(nub_clkn),
       .nub_resetn(nub_resetn),
@@ -249,18 +254,45 @@ module nubus
       .cpu_wdata(cpu_wdata),
       .cpu_ad_o(cpu_ad),
       .cpu_tm1n_o(cpu_tm1n),
-      .cpu_tm0n_o(cpu_tm0n)
-   );
+      .cpu_tm0n_o(cpu_tm0n),
+      .cpu_error_o(cpu_error),
+      .cpu_masterd_o(cpu_masterd)
+      );
 
-   nubus_errors_reg UErrorsReg
+   // ==========================================================================
+   // Memory Interface
+   // ==========================================================================
+   
+   nubus_membus UMemBus 
+     (
+      .nub_clkn(nub_clkn), // Clock
+      .nub_resetn(nub_resetn), // Reset
+      .nub_adn(nub_adn),
+
+      .slv_tm1n(slv_tm1n),
+      .slv_tm0n(slv_tm0n),
+      .slv_myslotcy(slv_myslotcy),
+      .slv_addr(slv_addr),
+
+      .mem_addr_o(mem_addr),
+      .mem_write_o(mem_write),
+      .mem_wdata_o(mem_wdata) 
+      );
+   
+   // ==========================================================================
+   // Errrors Interface
+   // ==========================================================================
+   
+   nubus_errors UErrorsReg
      (
       .nub_clkn(nub_clkn),
       .nub_resetn(nub_resetn),
-      .mst_timeout(msk_timeout),
+      .mst_timeout(mst_timeout),
       .mem_error(mem_error),
+      .mem_tryagain(mem_tryagain),
       .nub_noparity(nub_noparity),
       .cpu_error(cpu_error),
-      .cpu_errclr(cpu_errclr),
+      .cpu_eclr(cpu_eclr),
       .cpu_errors_o(cpu_errors),
       .mis_errorn_o(mis_errorn)
       );

@@ -1,5 +1,8 @@
+# XiBus Ξ
 
-Implementation of NuBus controller with Verilog
+Implementation of NuBus controller with Verilog for using with RiscV. 
+
+Designed for integration with [PicoRV](https://github.com/cliffordwolf/picorv32)
 
 ## ToDo List
 

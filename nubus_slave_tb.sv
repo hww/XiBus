@@ -2,7 +2,7 @@
 
 module nubus_slave_tb ();
 
-`include "nubus_tb_inc.sv"
+`include "nubus_tb.svh"
 
    parameter TEST_CARD_ID    = 'h0;
    parameter TEST_ADDR = 'hF0000000;

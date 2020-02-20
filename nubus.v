@@ -1,3 +1,9 @@
+/*
+ * NuBus controller
+ * 
+ * Autor: Valeriya Pudova (hww.github.io)
+ */
+
 module nubus
   #(
     // Activate simple or standard memory map

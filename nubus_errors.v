@@ -12,7 +12,7 @@ module nubus_errors
    output [1:0] mis_errorn_o
    );
 
-`include "nubus_inc.sv"
+`include "nubus.svh"
    
    // ==========================================================================
    // Error Register, keep last error event

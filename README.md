@@ -1,4 +1,4 @@
-# XiBus Ξ
+# Ξ XiBus 
 
 Implementation of NuBus controller with Verilog for using with RiscV. 
 

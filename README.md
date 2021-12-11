@@ -43,7 +43,7 @@ nubus_master.v - Master controller
 
 nubus_slave.v - Slave controller
 
-nubus_inc.sv - Included to various files definition of NuBus signals
+nubus.svh - Included to various files definition of NuBus signals
 
 nubus_arbiter_tb.sv - Arbiter's test bench
 
@@ -53,7 +53,7 @@ nubus_master_tb.sv - Master controller test bench (CPU access to slave with NuBu
 
 nubus_memory.sv - Memory controller used for tests
 
-cpu_bus.v - Encoder from PicoRV bus to this NuBus controller
+nubus_cpubus.v - Encoder from PicoRV bus to this NuBus controller
 
 ## Makefile
 

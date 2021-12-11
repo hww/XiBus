@@ -2,7 +2,7 @@
 
 module nubus_master_tb ();
 
-`include "nubus_tb_inc.sv"
+`include "nubus_tb.svh"
 
    // Simplifyed memory layout (see nubus_master.v)
    parameter SIMPLE_MAP = 0;

@@ -83,7 +83,7 @@ module nubus
     output        mem_myslot
   );
 
-  `include "nubus_inc.sv"
+  `include "nubus.svh"
 
    // ==========================================================================
    // Colock and reset
